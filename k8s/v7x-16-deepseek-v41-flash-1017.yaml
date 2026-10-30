@@ -1,0 +1,331 @@
+apiVersion: leaderworkerset.x-k8s.io/v1
+kind: LeaderWorkerSet
+metadata:
+  name: vllm-v7x-16-spot
+  namespace: default
+  annotations:
+    leaderworkerset.sigs.k8s.io/exclusive-topology: cloud.google.com/gke-nodepool
+spec:
+  replicas: 1
+  leaderWorkerTemplate:
+    size: 4
+    restartPolicy: RecreateGroupOnPodRestart
+    leaderTemplate:
+      metadata:
+        labels:
+          role: leader
+          app: vllm-v7x-16-spot
+          pass: deepseek-v41-flash-1017
+        annotations:
+          gke-gcsfuse/volumes: "true"
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      spec:
+        serviceAccountName: default
+        nodeSelector:
+          cloud.google.com/gke-nodepool: tpu-v7x-16-pool
+          cloud.google.com/gke-tpu-accelerator: tpu7x
+          cloud.google.com/gke-tpu-topology: 2x2x4
+        tolerations:
+        - key: "google.com/tpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "cloud.google.com/gke-spot"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+        containers:
+        - name: vllm-server
+          image: us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/vllm/vllm-torchtpu-bench:v0.32.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-c"]
+          args:
+          - |
+            set -e
+            ulimit -c 0 || true
+            mkdir -p /dev/shm/hf_cache /dev/shm/vllm_tmp /dev/shm/vllm_cache /dev/shm/torchinductor
+            unset TORCH_TPU_TOPOLOGY
+            export TPU_PROCESS_ADDRESSES=""
+            export RAY_EXPERIMENTAL_NOSET_TPU_VISIBLE_CHIPS=1
+            ray start --head --port=6379 --labels="ray.io/tpu-worker-id=${TPU_WORKER_ID:-0}"
+            until [ "$(python3 -c 'import ray; ray.init(address="auto", logging_level="ERROR"); print(sum(1 for n in ray.nodes() if n["Alive"] and n.get("Resources", {}).get("TPU", 0) >= 8))' 2>/dev/null)" = "4" ]; do
+              echo "Waiting for all 4 v7x hosts (32 TensorCores, DeepSeek-V4.1-Flash-1017) to advertise TPU>=8 in Ray..."
+              sleep 5
+            done
+            ray status
+            vllm serve "${MODEL_PATH}" \
+              --tokenizer="${TOKENIZER_PATH}" \
+              --served-model-name="${SERVED_MODEL_NAME}" \
+              --host=0.0.0.0 \
+              --port=8000 \
+              --api-server-count=1 \
+              --attention-backend=CUSTOM \
+              --tensor-parallel-size=2 \
+              --data-parallel-size=16 \
+              --enable-expert-parallel \
+              --enable-ep-weight-filter \
+              --load-format=runai_streamer \
+              --safetensors-load-strategy=prefetch \
+              --model-loader-extra-config='{"memory_limit":4294967296,"concurrency":8}' \
+              --kv-cache-dtype=fp8 \
+              --gpu-memory-utilization=0.88 \
+              --max-model-len=32768 \
+              --max-num-seqs=64 \
+              --max-num-batched-tokens=512 \
+              --language-model-only \
+              --engram-config='{"cpu_offload":false,"embedding_across_dp":true}' \
+              --compilation-config='{"compile_sizes":[4,16,64,256,512]}' \
+              --enable-prefix-caching \
+              --tool-call-parser=deepseek_v41 \
+              --reasoning-parser=deepseek_v41 \
+              --enable-auto-tool-choice \
+              --async-scheduling \
+              --trust-remote-code 2>&1 | tee /models/benchmark-results/deepseek_v41_flash_1017_startup.log
+          env:
+          - name: MODEL_PATH
+            value: "gs://YOUR_GCS_BUCKET/models/deepseek-ai/DeepSeek-V4.1-Flash-1017"
+          - name: TOKENIZER_PATH
+            value: "/models/models/deepseek-ai/DeepSeek-V4.1-Flash-1017"
+          - name: SERVED_MODEL_NAME
+            value: "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+          - name: RUNAI_STREAMER_PROCESS_GROUP_SIZE
+            value: "8"
+          - name: RUNAI_STREAMER_CONCURRENCY
+            value: "8"
+          - name: RUNAI_STREAMER_MEMORY_LIMIT
+            value: "8589934592"
+          - name: VLLM_TPU_WEIGHT_LOAD_SYNC_INTERVAL
+            value: "100"
+          - name: HF_HOME
+            value: "/dev/shm/hf_cache"
+          - name: TMPDIR
+            value: "/dev/shm/vllm_tmp"
+          - name: VLLM_CACHE_ROOT
+            value: "/dev/shm/vllm_cache"
+          - name: VLLM_XLA_CACHE_PATH
+            value: "/dev/shm/vllm_cache"
+          - name: TORCHINDUCTOR_CACHE_DIR
+            value: "/dev/shm/torchinductor"
+          - name: TORCHINDUCTOR_AUTOGRAD_CACHE
+            value: "0"
+          - name: TORCH_DIST_TIMEOUT
+            value: "1800"
+          - name: VLLM_RPC_TIMEOUT
+            value: "1800000"
+          - name: VLLM_SHM_BROADCAST_TIMEOUT_S
+            value: "1800"
+          - name: VLLM_ENGINE_ITERATION_TIMEOUT_S
+            value: "1800"
+          - name: VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS
+            value: "1800"
+          - name: VLLM_ENGINE_READY_TIMEOUT_S
+            value: "7200"
+          - name: VLLM_RAY_EXTRA_ENV_VARS_TO_COPY
+            value: "RUNAI_STREAMER_PROCESS_GROUP_SIZE,RUNAI_STREAMER_CONCURRENCY,RUNAI_STREAMER_MEMORY_LIMIT,VLLM_TPU_WEIGHT_LOAD_SYNC_INTERVAL,TORCH_DIST_TIMEOUT,TMPDIR,HF_HOME,TORCHINDUCTOR_CACHE_DIR,TORCHINDUCTOR_AUTOGRAD_CACHE"
+          - name: HUGGING_FACE_HUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: hf-token
+                key: HF_TOKEN
+          - name: TPU_MULTIHOST_BACKEND
+            value: "ray"
+          - name: TPU_PROCESS_ADDRESSES
+            value: ""
+          - name: TPU_SKIP_MDS_QUERY
+            value: "1"
+          - name: RAY_EXPERIMENTAL_NOSET_TPU_VISIBLE_CHIPS
+            value: "1"
+          - name: VLLM_PLUGINS
+            value: "torchtpu"
+          - name: VLLM_TARGET_DEVICE
+            value: "tpu"
+          - name: PJRT_DEVICE
+            value: "TPU"
+          - name: VLLM_WORKER_MULTIPROC_METHOD
+            value: "spawn"
+          - name: VLLM_NO_USAGE_STATS
+            value: "1"
+          ports:
+          - containerPort: 8000
+          resources:
+            limits:
+              google.com/tpu: "4"
+            requests:
+              google.com/tpu: "4"
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          volumeMounts:
+          - name: models-gcs
+            mountPath: /models
+          - name: dshm
+            mountPath: /dev/shm
+        volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: models-gcs
+          persistentVolumeClaim:
+            claimName: tpu-models-gcs-pvc
+    workerTemplate:
+      metadata:
+        labels:
+          role: worker
+          app: vllm-v7x-16-spot
+          pass: deepseek-v41-flash-1017
+        annotations:
+          gke-gcsfuse/volumes: "true"
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      spec:
+        serviceAccountName: default
+        nodeSelector:
+          cloud.google.com/gke-nodepool: tpu-v7x-16-pool
+          cloud.google.com/gke-tpu-accelerator: tpu7x
+          cloud.google.com/gke-tpu-topology: 2x2x4
+        tolerations:
+        - key: "google.com/tpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "cloud.google.com/gke-spot"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+        containers:
+        - name: vllm-server
+          image: us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/vllm/vllm-torchtpu-bench:v0.32.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-c"]
+          args:
+          - |
+            set -e
+            ulimit -c 0 || true
+            mkdir -p /dev/shm/hf_cache /dev/shm/vllm_tmp /dev/shm/vllm_cache /dev/shm/torchinductor
+            unset TORCH_TPU_TOPOLOGY
+            export TPU_PROCESS_ADDRESSES=""
+            export RAY_EXPERIMENTAL_NOSET_TPU_VISIBLE_CHIPS=1
+            until (echo > "/dev/tcp/${LWS_LEADER_ADDRESS}/6379") 2>/dev/null; do
+              echo "Waiting for Ray head at ${LWS_LEADER_ADDRESS}:6379..."
+              sleep 3
+            done
+            ray start --address="${LWS_LEADER_ADDRESS}:6379" --labels="ray.io/tpu-worker-id=${TPU_WORKER_ID:-0}" --block
+          env:
+          - name: RUNAI_STREAMER_PROCESS_GROUP_SIZE
+            value: "8"
+          - name: RUNAI_STREAMER_CONCURRENCY
+            value: "8"
+          - name: RUNAI_STREAMER_MEMORY_LIMIT
+            value: "8589934592"
+          - name: VLLM_TPU_WEIGHT_LOAD_SYNC_INTERVAL
+            value: "100"
+          - name: HF_HOME
+            value: "/dev/shm/hf_cache"
+          - name: TMPDIR
+            value: "/dev/shm/vllm_tmp"
+          - name: VLLM_CACHE_ROOT
+            value: "/dev/shm/vllm_cache"
+          - name: VLLM_XLA_CACHE_PATH
+            value: "/dev/shm/vllm_cache"
+          - name: TORCHINDUCTOR_CACHE_DIR
+            value: "/dev/shm/torchinductor"
+          - name: TORCHINDUCTOR_AUTOGRAD_CACHE
+            value: "0"
+          - name: TORCH_DIST_TIMEOUT
+            value: "1800"
+          - name: VLLM_RPC_TIMEOUT
+            value: "1800000"
+          - name: VLLM_SHM_BROADCAST_TIMEOUT_S
+            value: "1800"
+          - name: VLLM_ENGINE_ITERATION_TIMEOUT_S
+            value: "1800"
+          - name: VLLM_EXECUTE_MODEL_TIMEOUT_SECONDS
+            value: "1800"
+          - name: VLLM_ENGINE_READY_TIMEOUT_S
+            value: "7200"
+          - name: VLLM_RAY_EXTRA_ENV_VARS_TO_COPY
+            value: "RUNAI_STREAMER_PROCESS_GROUP_SIZE,RUNAI_STREAMER_CONCURRENCY,RUNAI_STREAMER_MEMORY_LIMIT,VLLM_TPU_WEIGHT_LOAD_SYNC_INTERVAL,TORCH_DIST_TIMEOUT,TMPDIR,HF_HOME,TORCHINDUCTOR_CACHE_DIR,TORCHINDUCTOR_AUTOGRAD_CACHE"
+          - name: HUGGING_FACE_HUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: hf-token
+                key: HF_TOKEN
+          - name: TPU_MULTIHOST_BACKEND
+            value: "ray"
+          - name: TPU_PROCESS_ADDRESSES
+            value: ""
+          - name: TPU_SKIP_MDS_QUERY
+            value: "1"
+          - name: RAY_EXPERIMENTAL_NOSET_TPU_VISIBLE_CHIPS
+            value: "1"
+          - name: VLLM_PLUGINS
+            value: "torchtpu"
+          - name: VLLM_TARGET_DEVICE
+            value: "tpu"
+          - name: PJRT_DEVICE
+            value: "TPU"
+          - name: VLLM_WORKER_MULTIPROC_METHOD
+            value: "spawn"
+          - name: VLLM_NO_USAGE_STATS
+            value: "1"
+          resources:
+            limits:
+              google.com/tpu: "4"
+            requests:
+              google.com/tpu: "4"
+          volumeMounts:
+          - name: models-gcs
+            mountPath: /models
+          - name: dshm
+            mountPath: /dev/shm
+        volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: models-gcs
+          persistentVolumeClaim:
+            claimName: tpu-models-gcs-pvc
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bench-v7x-16-spot-deepseek-v41
+  namespace: default
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      annotations:
+        gke-gcsfuse/volumes: "true"
+    spec:
+      serviceAccountName: default
+      restartPolicy: OnFailure
+      nodeSelector:
+        cloud.google.com/gke-nodepool: default-pool
+      containers:
+      - name: bench
+        image: us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/vllm/vllm-torchtpu-bench:v0.32.0
+        imagePullPolicy: IfNotPresent
+        command: ["python3", "/scripts/run_tpu_benchmark_sweep.py"]
+        args:
+        - --host=vllm-v7x-16-spot-svc
+        - --port=8000
+        - --tokenizer=/models/models/deepseek-ai/DeepSeek-V4.1-Flash-1017
+        - --slice-name=v7x-16-spot-2x2x4-32cores
+        - --config-tag=deepseek-v41-flash-1017-tp2-dp16-ep32-prefixcache
+        - --max-input-len=30000
+        - --output-len=1024
+        - --concurrencies=1,4,8,16,32,64
+        - --context-lengths=2048,8192,16384,30000
+        - --output-dir=/models/benchmark-results
+        volumeMounts:
+        - name: models-gcs
+          mountPath: /models
+        - name: bench-script
+          mountPath: /scripts
+      volumes:
+      - name: models-gcs
+        persistentVolumeClaim:
+          claimName: tpu-models-gcs-pvc
+      - name: bench-script
+        configMap:
+          name: tpu-bench-script
