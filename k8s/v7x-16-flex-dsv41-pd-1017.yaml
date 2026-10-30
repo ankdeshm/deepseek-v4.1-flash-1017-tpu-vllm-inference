@@ -1,0 +1,74 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dsv41-pd-1017
+  namespace: default
+spec:
+  completions: 4
+  parallelism: 4
+  completionMode: Indexed
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: dsv41-pd-1017
+      annotations:
+        gke-gcsfuse/volumes: "true"
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    spec:
+      serviceAccountName: default
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Never
+      nodeSelector:
+        cloud.google.com/gke-nodepool: tpu-v7x-16-pool
+        cloud.google.com/gke-tpu-accelerator: tpu7x
+        cloud.google.com/gke-tpu-topology: 2x2x4
+      tolerations:
+      - key: "google.com/tpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "cloud.google.com/gke-queued"
+        operator: "Exists"
+        effect: "NoSchedule"
+      containers:
+      - name: dsv41-pd
+        image: vllm/vllm-tpu:nightly
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        command: ["python3", "-u", "/scripts/run_dsv41_pd_1017.py"]
+        args:
+        - --gcs-bucket=YOUR_GCS_BUCKET
+        - --stack-prefix=dsv41-stack
+        - --model-prefix=models/deepseek-ai/DeepSeek-V4.1-Flash-1017/
+        - --run-tag=20261030_1p1d_2p2d
+        - --output-dir=/models/benchmark-results
+        - --duration-80=120
+        - --duration-95=90
+        env:
+        - name: PJRT_DEVICE
+          value: "TPU"
+        resources:
+          requests:
+            google.com/tpu: "4"
+          limits:
+            google.com/tpu: "4"
+        volumeMounts:
+        - name: dshm
+          mountPath: /dev/shm
+        - name: models-gcs
+          mountPath: /models
+        - name: runner-script
+          mountPath: /scripts
+      volumes:
+      - name: dshm
+        hostPath:
+          path: /dev/shm
+          type: Directory
+      - name: models-gcs
+        persistentVolumeClaim:
+          claimName: tpu-models-gcs-pvc
+      - name: runner-script
+        configMap:
+          name: dsv41-pd-runner-script
