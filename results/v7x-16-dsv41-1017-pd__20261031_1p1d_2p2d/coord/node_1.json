@@ -1,0 +1,8 @@
+{
+  "idx": 1,
+  "role": "decode",
+  "pair": "pairA",
+  "run_id": "pairA_20261031_1p1d_2p2d",
+  "ip": "192.168.100.16",
+  "hostname": "gke-tpu-b44c435a-6d34.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+}

@@ -1,0 +1,99 @@
+Loaded 30 tool-calling templates and 30 exact sampling specs from /tmp/requests_mocked.jsonl (model=deepseek-ai/DeepSeek-V4.1-Flash)
+Waiting for prefill health at http://127.0.0.1:8400/health ...
+  [prefill] Healthy (HTTP 200)!
+Waiting for decode health at http://192.168.100.16:9400/health ...
+  [decode] Healthy (HTTP 200)!
+
+>>> [n=8 SESSIONS, TRUNKS=40] (90s) Measured Zero-Compile Benchmark Run (Exact Temps, 50:20:12:9:9) <<<
+  [reset_prefix_cache] prefill: OK (HTTP 200)
+  [reset_prefix_cache] decode: OK (HTTP 200)
+
+[n=8] Phase 0 (Warmup — 40 Distinct Trunks {'1-8K': 8, '8-16K': 8, '16-32K': 8, '32-64K': 8, '64K+': 8}): Stage1=40 trunks (1,289,932 prefix tok), Stage2=0 trunks (total target ISL=1,357,824 tok, 95% prefix=1,289,932 tok)...
+[n=8] Phase 0 Warmup complete: 40/40 distinct trunks populated (1,201,222 total prompt tokens) in 15.15s. Starting measured benchmark...
+============================================================================================================
+RESULTS FOR n=8 SESSIONS (Trunks=40, Continuous 90s Window) | TrunksUsed=37/40 | OK=155/155 (ToolCalls=155, In-Win=147) | Win=90.0s | DrainWall=95.35s
+------------------------------------------------------------------------------------------------------------
+  Mean ISL: 17,985.6 tok | Cached: 17,170.2 tok (95.47%) | Mean Output: 482.1 tok
+  Steady-State Window Tput : Output=809.6 tok/s | Input=30,728.0 tok/s | Uncached=1,396.1 tok/s
+  Full-Drain Wall Tput     : Output=783.7 tok/s | Input=29,238.0 tok/s | RPS=1.63
+  3-Yr CUD Cost ($43.20/hr) : Out(Win)=$14.82/1M | Out(Drain)=$15.31/1M | In(Win)=$0.391/1M | Blended=$0.380/1M
+  Client Decode Speed/Strm : Median=111.79 tok/s (P95_low=95.19, P90_low=98.92, P90_hi=137.67) | Per-Token ITL=8.95ms (StepChunk=26.62ms, Mean=38.47ms)
+  Latency                  : Median TTFT=0.32s (P90=0.95s) | Median E2E=3.87s
+  Per-Bucket Breakdown:
+    1-8K     (trunks= 8): reqs= 77 | Mean ISL=  6,295 | Mean OSL= 389.4 | Hit= 97.6% | Med TTFT=  0.27s | P90 TTFT=  0.80s | Med TPS/strm=111.8
+    8-16K    (trunks= 8): reqs= 31 | Mean ISL= 10,468 | Mean OSL= 414.7 | Hit= 97.8% | Med TTFT=  0.31s | P90 TTFT=  0.66s | Med TPS/strm=112.2
+    16-32K   (trunks= 8): reqs= 19 | Mean ISL= 22,241 | Mean OSL= 582.9 | Hit= 96.7% | Med TTFT=  0.42s | P90 TTFT=  0.54s | Med TPS/strm=110.6
+    32-64K   (trunks= 8): reqs= 14 | Mean ISL= 48,954 | Mean OSL= 738.6 | Hit= 94.1% | Med TTFT=  0.92s | P90 TTFT=  1.00s | Med TPS/strm=104.6
+    64K+     (trunks= 8): reqs= 14 | Mean ISL= 62,186 | Mean OSL= 747.9 | Hit= 93.9% | Med TTFT=  1.01s | P90 TTFT=  1.39s | Med TPS/strm=114.5
+============================================================================================================
+
+>>> [n=32 SESSIONS, TRUNKS=40] (90s) Measured Zero-Compile Benchmark Run (Exact Temps, 50:20:12:9:9) <<<
+  [reset_prefix_cache] prefill: OK (HTTP 200)
+  [reset_prefix_cache] decode: OK (HTTP 200)
+
+[n=32] Phase 0 (Warmup — 40 Distinct Trunks {'1-8K': 8, '8-16K': 8, '16-32K': 8, '32-64K': 8, '64K+': 8}): Stage1=40 trunks (1,289,932 prefix tok), Stage2=0 trunks (total target ISL=1,357,824 tok, 95% prefix=1,289,932 tok)...
+[n=32] Phase 0 Warmup complete: 40/40 distinct trunks populated (1,201,212 total prompt tokens) in 15.23s. Starting measured benchmark...
+============================================================================================================
+RESULTS FOR n=32 SESSIONS (Trunks=40, Continuous 90s Window) | TrunksUsed=40/40 | OK=507/507 (ToolCalls=507, In-Win=475) | Win=90.0s | DrainWall=124.11s
+------------------------------------------------------------------------------------------------------------
+  Mean ISL: 17,985.7 tok | Cached: 17,169.7 tok (95.46%) | Mean Output: 480.5 tok
+  Steady-State Window Tput : Output=2,592.8 tok/s | Input=100,084.7 tok/s | Uncached=4,522.8 tok/s
+  Full-Drain Wall Tput     : Output=1,962.8 tok/s | Input=73,472.3 tok/s | RPS=4.09
+  3-Yr CUD Cost ($43.20/hr) : Out(Win)=$4.63/1M | Out(Drain)=$6.11/1M | In(Win)=$0.120/1M | Blended=$0.117/1M
+  Client Decode Speed/Strm : Median=89.60 tok/s (P95_low=61.11, P90_low=69.88, P90_hi=110.37) | Per-Token ITL=11.16ms (StepChunk=32.65ms, Mean=48.83ms)
+  Latency                  : Median TTFT=0.85s (P90=1.24s) | Median E2E=4.99s
+  Per-Bucket Breakdown:
+    1-8K     (trunks= 8): reqs=253 | Mean ISL=  6,294 | Mean OSL= 320.2 | Hit= 97.6% | Med TTFT=  0.72s | P90 TTFT=  1.19s | Med TPS/strm= 87.2
+    8-16K    (trunks= 8): reqs=101 | Mean ISL= 10,468 | Mean OSL= 502.5 | Hit= 97.8% | Med TTFT=  0.69s | P90 TTFT=  1.23s | Med TPS/strm= 98.0
+    16-32K   (trunks= 8): reqs= 61 | Mean ISL= 22,241 | Mean OSL= 653.8 | Hit= 96.7% | Med TTFT=  0.75s | P90 TTFT=  1.18s | Med TPS/strm= 91.0
+    32-64K   (trunks= 8): reqs= 46 | Mean ISL= 48,953 | Mean OSL= 702.8 | Hit= 94.1% | Med TTFT=  0.94s | P90 TTFT=  1.03s | Med TPS/strm= 91.7
+    64K+     (trunks= 8): reqs= 46 | Mean ISL= 62,185 | Mean OSL= 861.9 | Hit= 93.9% | Med TTFT=  1.29s | P90 TTFT=  1.54s | Med TPS/strm= 89.3
+============================================================================================================
+
+>>> [n=64 SESSIONS, TRUNKS=64] (90s) Measured Zero-Compile Benchmark Run (Exact Temps, 50:20:12:9:9) <<<
+  [reset_prefix_cache] prefill: OK (HTTP 200)
+  [reset_prefix_cache] decode: OK (HTTP 200)
+
+[n=64] Phase 0 (Warmup — 64 Distinct Trunks {'1-8K': 32, '8-16K': 8, '16-32K': 8, '32-64K': 8, '64K+': 8}): Stage1=64 trunks (1,441,689 prefix tok), Stage2=0 trunks (total target ISL=1,517,568 tok, 95% prefix=1,441,689 tok)...
+[n=64] Phase 0 Warmup complete: 64/64 distinct trunks populated (1,352,336 total prompt tokens) in 19.93s. Starting measured benchmark...
+============================================================================================================
+RESULTS FOR n=64 SESSIONS (Trunks=64, Continuous 90s Window) | TrunksUsed=64/64 | OK=950/950 (ToolCalls=950, In-Win=886) | Win=90.0s | DrainWall=130.21s
+------------------------------------------------------------------------------------------------------------
+  Mean ISL: 17,905.0 tok | Cached: 17,094.3 tok (95.47%) | Mean Output: 477.0 tok
+  Steady-State Window Tput : Output=4,797.8 tok/s | Input=186,863.4 tok/s | Uncached=8,459.9 tok/s
+  Full-Drain Wall Tput     : Output=3,480.1 tok/s | Input=130,637.9 tok/s | RPS=7.30
+  3-Yr CUD Cost ($43.20/hr) : Out(Win)=$2.50/1M | Out(Drain)=$3.45/1M | In(Win)=$0.064/1M | Blended=$0.063/1M
+  Client Decode Speed/Strm : Median=86.17 tok/s (P95_low=57.62, P90_low=66.83, P90_hi=103.83) | Per-Token ITL=11.61ms (StepChunk=33.61ms, Mean=49.79ms)
+  Latency                  : Median TTFT=1.04s (P90=1.40s) | Median E2E=5.43s
+  Per-Bucket Breakdown:
+    1-8K     (trunks=32): reqs=475 | Mean ISL=  6,294 | Mean OSL= 331.3 | Hit= 97.6% | Med TTFT=  1.00s | P90 TTFT=  1.36s | Med TPS/strm= 82.3
+    8-16K    (trunks= 8): reqs=190 | Mean ISL= 10,468 | Mean OSL= 526.0 | Hit= 97.8% | Med TTFT=  1.05s | P90 TTFT=  1.40s | Med TPS/strm= 95.4
+    16-32K   (trunks= 8): reqs=114 | Mean ISL= 22,241 | Mean OSL= 635.1 | Hit= 96.7% | Med TTFT=  1.01s | P90 TTFT=  1.35s | Med TPS/strm= 87.2
+    32-64K   (trunks= 8): reqs= 86 | Mean ISL= 48,953 | Mean OSL= 702.6 | Hit= 94.1% | Med TTFT=  1.04s | P90 TTFT=  1.44s | Med TPS/strm= 84.5
+    64K+     (trunks= 8): reqs= 85 | Mean ISL= 62,186 | Mean OSL= 741.0 | Hit= 93.9% | Med TTFT=  1.33s | P90 TTFT=  1.56s | Med TPS/strm= 85.8
+============================================================================================================
+
+>>> [n=128 SESSIONS, TRUNKS=128] (90s) Measured Zero-Compile Benchmark Run (Exact Temps, 50:20:12:9:9) <<<
+  [reset_prefix_cache] prefill: OK (HTTP 200)
+  [reset_prefix_cache] decode: OK (HTTP 200)
+
+[n=128] Phase 0 (Warmup — 128 Distinct Trunks {'1-8K': 64, '8-16K': 24, '16-32K': 16, '32-64K': 16, '64K+': 8}): Stage1=128 trunks (2,375,577 prefix tok), Stage2=0 trunks (total target ISL=2,500,608 tok, 95% prefix=2,375,577 tok)...
+[n=128] Phase 0 Warmup complete: 128/128 distinct trunks populated (2,290,973 total prompt tokens) in 34.24s. Starting measured benchmark...
+============================================================================================================
+RESULTS FOR n=128 SESSIONS (Trunks=128, Continuous 90s Window) | TrunksUsed=128/128 | OK=1462/1462 (ToolCalls=1459, In-Win=1334) | Win=90.0s | DrainWall=116.41s
+------------------------------------------------------------------------------------------------------------
+  Mean ISL: 17,934.0 tok | Cached: 16,921.2 tok (94.35%) | Mean Output: 484.3 tok
+  Steady-State Window Tput : Output=7,446.2 tok/s | Input=287,198.9 tok/s | Uncached=16,259.9 tok/s
+  Full-Drain Wall Tput     : Output=6,082.5 tok/s | Input=225,230.2 tok/s | RPS=12.56
+  3-Yr CUD Cost ($43.20/hr) : Out(Win)=$1.61/1M | Out(Drain)=$1.97/1M | In(Win)=$0.042/1M | Blended=$0.041/1M
+  Client Decode Speed/Strm : Median=69.10 tok/s (P95_low=50.93, P90_low=57.28, P90_hi=83.14) | Per-Token ITL=14.47ms (StepChunk=41.80ms, Mean=60.27ms)
+  Latency                  : Median TTFT=1.27s (P90=1.94s) | Median E2E=6.98s
+  Per-Bucket Breakdown:
+    1-8K     (trunks=64): reqs=731 | Mean ISL=  6,294 | Mean OSL= 363.9 | Hit= 97.6% | Med TTFT=  1.24s | P90 TTFT=  1.81s | Med TPS/strm= 67.0
+    8-16K    (trunks=24): reqs=292 | Mean ISL= 10,467 | Mean OSL= 482.0 | Hit= 97.8% | Med TTFT=  1.27s | P90 TTFT=  1.93s | Med TPS/strm= 75.4
+    16-32K   (trunks=16): reqs=175 | Mean ISL= 22,240 | Mean OSL= 667.3 | Hit= 96.7% | Med TTFT=  1.30s | P90 TTFT=  1.87s | Med TPS/strm= 71.6
+    32-64K   (trunks=16): reqs=132 | Mean ISL= 48,952 | Mean OSL= 757.3 | Hit= 94.1% | Med TTFT=  1.25s | P90 TTFT=  1.99s | Med TPS/strm= 67.1
+    64K+     (trunks= 8): reqs=132 | Mean ISL= 62,185 | Mean OSL= 640.7 | Hit= 90.3% | Med TTFT=  1.35s | P90 TTFT=  2.13s | Med TPS/strm= 67.7
+============================================================================================================
+
+Saved full 5-or-N trunks exact-temps sweep summary to /models/benchmark-results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_1p1d_95pct.json

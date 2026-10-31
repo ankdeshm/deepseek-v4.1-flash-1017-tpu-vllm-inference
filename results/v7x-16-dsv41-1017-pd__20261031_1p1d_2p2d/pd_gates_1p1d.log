@@ -1,0 +1,12 @@
+[GATE-2+2] pd_passed=True pd=['4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4']
+[GATE-2+2] local_passed=True local=['4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4']
+[GATE-USA] pd_states=50/50 local_states=50/50 pd==local=False tau=3.514 pd_tail='" — more commonly written as New Hampshire, New Jersey, New Mexico, North Carolina, North Dakota, Rhode Island, South Carolina, South Dakota, and West Virginia.'
+[GATE-EQ] n=64 equal=False first_div=10 pd='739204<｜end▁of▁sentence｜>@@<｜end▁of▁sentence｜><ds_safety_verification_verifier_v' local='739204<｜end▁of▁sentence｜>@@<｜end▁of▁sentence｜><ds_safety_handling_meta_web_play_'
+[GATE-EQ] n=700 equal=True first_div=None pd='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D' local='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D'
+[GATE-EQ] n=1500 equal=True first_div=None pd='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D' local='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D'
+[GATE-EQ] n=5000 equal=True first_div=None pd='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D' local='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D'
+[GATE-EQ] n=20000 equal=True first_div=None pd='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D' local='739204, Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, D'
+[BENCH-PD] n=16 c=8 in=8192 out=128 ttft_mean=0.8764s p50=0.6713s tpot=13.134ms tau=2.0771 out_tok/s=342.48 int_tok/s=521.61 step_ms=31.86 in_tok/s=21918.87 active_in_tok/s=32514.12
+[BENCH-LOCAL] n=16 c=8 in=8192 out=128 ttft_mean=3.8214s p50=3.2652s tpot=24.856ms tau=3.381 out_tok/s=138.45
+[BENCH-PD-C64] n=64 c=64 in=1024 out=512 ttft_mean=2.4686s p50=2.9064s tpot=16.098ms tau=2.6861 out_tok/s=2378.51 int_tok/s=5801.96 @3.5=7559.96 step_ms=29.63
+[PD-GATES] hard_gates_passed=False

@@ -1,0 +1,8 @@
+{
+  "idx": 2,
+  "role": "prefill",
+  "pair": "pairB",
+  "run_id": "pairB_20261031_1p1d_2p2d",
+  "ip": "192.168.100.14",
+  "hostname": "gke-tpu-b44c435a-5cch.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+}
