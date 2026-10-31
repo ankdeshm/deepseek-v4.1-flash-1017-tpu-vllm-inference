@@ -42,7 +42,7 @@ spec:
         - --gcs-bucket=YOUR_GCS_BUCKET
         - --stack-prefix=dsv41-stack
         - --model-prefix=models/deepseek-ai/DeepSeek-V4.1-Flash-1017/
-        - --run-tag=20261030_1p1d_2p2d
+        - --run-tag=20261031_1p1d_2p2d
         - --output-dir=/models/benchmark-results
         - --duration-80=120
         - --duration-95=90

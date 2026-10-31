@@ -8,8 +8,8 @@ Coordinates 4 Indexed Job pods across a 4-host TPU v7x slice (`tpu7x-standard-4t
   - Index 3: Decode B  (`ROLE=decode,  DP=8, TP=1, EP=8, ENABLE_DSPARK=1 K=5, MNBT=384`)
 
 Each host runs independently as a single-host `2x2x1` (`8` TensorCores) via `mock_metadata.py` +
-`LD_PRELOAD=/workspace/metadata_hook.so` (with `VBAR_CONTROL_SERVICE_URL` explicitly unset so GKE's
-slice vbar socket never blocks single-host init) and transfers KV blocks over `TPURaidenConnector` Stage 3 DCN.
+`LD_PRELOAD=/workspace/metadata_hook.so` + `VBAR_CONTROL_SERVICE_URL=unix:///var/run/tpu-plugin/vbar.sock`
+and transfers KV blocks over `TPURaidenConnector` Stage 3 DCN.
 """
 
 from __future__ import annotations
@@ -477,14 +477,10 @@ git config --global --add safe.directory '*' || true
 """
     subprocess.run(["bash", "-lc", stage_sh], check=True)
 
-    # CRITICAL: Remove VBAR_CONTROL_SERVICE_URL export in launch_dsv41_disagg_role.sh so 2x2x4 slice vbar never blocks 2x2x1 single-host init!
+    # Verify launch_dsv41_disagg_role.sh preserves VBAR_CONTROL_SERVICE_URL=/var/run/tpu-plugin/vbar.sock
+    # (required by tpu7x START_SESSION when 8 TensorCore workers initialize on 4 physical chips).
     launch_p = Path("/workspace/vllm-torchtpu/examples/disagg/launch_dsv41_disagg_role.sh")
-    launch_txt = launch_p.read_text()
-    launch_txt = launch_txt.replace(
-        '[ -S /var/run/tpu-plugin/vbar.sock ] \\\n  && export VBAR_CONTROL_SERVICE_URL="unix:///var/run/tpu-plugin/vbar.sock"',
-        '# Unset VBAR_CONTROL_SERVICE_URL on multi-host GKE nodepools running independent 2x2x1 hosts\nunset VBAR_CONTROL_SERVICE_URL',
-    )
-    launch_p.write_text(launch_txt)
+    assert "VBAR_CONTROL_SERVICE_URL" in launch_p.read_text(), "Missing VBAR_CONTROL_SERVICE_URL in launcher"
 
     # Write /tmp/dsv41_dl.py + /tmp/dsv41_env.sh pointing at our regional us-central1 GCS bucket
     tok = vm_access_token()
