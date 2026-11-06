@@ -4,5 +4,5 @@
   "pair": "pairA",
   "run_id": "pairA_20261031_1p1d_2p2d",
   "ip": "192.168.100.19",
-  "hostname": "gke-tpu-b44c435a-w61p.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+  "hostname": "tpu-v7x-worker-node.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
 }

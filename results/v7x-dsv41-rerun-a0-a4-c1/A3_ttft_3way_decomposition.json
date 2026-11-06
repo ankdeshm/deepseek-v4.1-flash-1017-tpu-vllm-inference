@@ -1,0 +1,66 @@
+{
+  "matched_requests": 14867,
+  "total_completed_in_window": 14867,
+  "unmatched_uuid_requests": 0,
+  "ttft_ms": {
+    "count": 14867,
+    "mean": 1261.639,
+    "p50": 1232.66,
+    "p90": 1565.728,
+    "p99": 3933.855,
+    "min": 190.76,
+    "max": 5322.16
+  },
+  "prefill_queue_plus_compute_ms": {
+    "count": 14867,
+    "mean": 939.974,
+    "p50": 911.6,
+    "p90": 1188.534,
+    "p99": 3706.429,
+    "min": 110.77,
+    "max": 5059.53
+  },
+  "prefill_rpc_ms": {
+    "count": 14867,
+    "mean": 936.436,
+    "p50": 908.22,
+    "p90": 1183.962,
+    "p99": 3704.296,
+    "min": 110.31,
+    "max": 5056.32
+  },
+  "kv_transfer_raiden_stage3_ms": {
+    "count": 14867,
+    "mean": 63.528,
+    "p50": 58.946,
+    "p90": 87.766,
+    "p99": 154.495,
+    "min": 21.793,
+    "max": 406.285
+  },
+  "decode_slot_wait_plus_1st_step_tail_replay_ms": {
+    "count": 14867,
+    "mean": 258.138,
+    "p50": 257.362,
+    "p90": 361.257,
+    "p99": 486.815,
+    "min": 50.869,
+    "max": 2385.182
+  },
+  "decode_health": {
+    "kv_cache_tokens_per_rank": 3980492,
+    "num_ranks_logged_kv": 8,
+    "preemption_log_matches": 0,
+    "oom_log_matches": 0,
+    "sample_hbm_lines": [
+      "WARNING 11-05 03:17:05 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_1 pid=253830) (ApiServer_6 pid=253835) WARNING 11-05 03:17:20 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_6 pid=253835) WARNING 11-05 03:17:20 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_2 pid=253831) (ApiServer_0 pid=253829) WARNING 11-05 03:17:20 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_5 pid=253834) WARNING 11-05 03:17:20 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_0 pid=253829) (ApiServer_6 pid=253835) WARNING 11-05 03:17:20 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_7 pid=253836) WARNING 11-05 03:17:20 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM",
+      "(ApiServer_3 pid=253832) WARNING 11-05 03:17:21 [interface.py:1274] Unknown vLLM environment variable detected: VLLM_LOG_POST_WARMUP_HBM"
+    ]
+  }
+}

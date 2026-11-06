@@ -8,7 +8,7 @@
       "pair": "pairA",
       "run_id": "pairA_20261031_1p1d_2p2d",
       "ip": "192.168.100.19",
-      "hostname": "gke-tpu-b44c435a-w61p.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+      "hostname": "tpu-v7x-worker-node.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
     },
     "1": {
       "idx": 1,
@@ -16,7 +16,7 @@
       "pair": "pairA",
       "run_id": "pairA_20261031_1p1d_2p2d",
       "ip": "192.168.100.16",
-      "hostname": "gke-tpu-b44c435a-6d34.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+      "hostname": "tpu-v7x-worker-node.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
     },
     "2": {
       "idx": 2,
@@ -24,7 +24,7 @@
       "pair": "pairB",
       "run_id": "pairB_20261031_1p1d_2p2d",
       "ip": "192.168.100.14",
-      "hostname": "gke-tpu-b44c435a-5cch.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+      "hostname": "tpu-v7x-worker-node.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
     },
     "3": {
       "idx": 3,
@@ -32,7 +32,7 @@
       "pair": "pairB",
       "run_id": "pairB_20261031_1p1d_2p2d",
       "ip": "192.168.100.9",
-      "hostname": "gke-tpu-b44c435a-kxr6.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
+      "hostname": "tpu-v7x-worker-node.us-central1-c.c.YOUR_GCP_PROJECT_ID.internal"
     }
   },
   "boot_s": 1590.2,

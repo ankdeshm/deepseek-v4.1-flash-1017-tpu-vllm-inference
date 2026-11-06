@@ -17,7 +17,7 @@ INFO 10-31 01:19:34 [__init__.py:54] - torchtpu -> vllm_torchtpu.platforms:regis
 INFO 10-31 01:19:34 [__init__.py:66] Loading plugin torchtpu
 [LD_PRELOAD] [01:19:35] [vllm:232] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:19:35] [vllm:232] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:19:35 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:19:35 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:19:35 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:19:35 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:19:35 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -134,7 +134,7 @@ INFO 10-31 01:19:54 [__init__.py:54] - torchtpu -> vllm_torchtpu.platforms:regis
 INFO 10-31 01:19:54 [__init__.py:66] Loading plugin torchtpu
 [LD_PRELOAD] [01:19:54] [python3.12:519] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:19:54] [python3.12:519] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:19:54 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:19:54 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:19:54 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:19:54 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:19:54 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -352,19 +352,19 @@ INFO 10-31 01:20:00 [__init__.py:54] - torchtpu -> vllm_torchtpu.platforms:regis
 INFO 10-31 01:20:00 [__init__.py:66] Loading plugin torchtpu
 [LD_PRELOAD] [01:20:00] [python3.12:556] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:00] [python3.12:556] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:00 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:00 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:00 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:00 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:00 [tpu_platform.py:1092] Pin memory is not supported on TPU.
 [LD_PRELOAD] [01:20:00] [python3.12:552] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:00] [python3.12:552] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:00 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:00 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:00 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:00] [python3.12:554] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 INFO 10-31 01:20:00 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:00 [tpu_platform.py:1092] Pin memory is not supported on TPU.
 [LD_PRELOAD] [01:20:00] [python3.12:554] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:00 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:00 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:00 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:00 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:00 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -373,30 +373,30 @@ WARNING 10-31 01:20:00 [tpu_platform.py:1092] Pin memory is not supported on TPU
 [LD_PRELOAD] [01:20:01] [python3.12:550] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:559] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:557] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:01] [python3.12:558] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:547] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:557] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:553] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:546] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:01] [python3.12:559] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:01] [python3.12:546] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:553] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:547] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU.
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -408,7 +408,7 @@ WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU
 [LD_PRELOAD] [01:20:01] [python3.12:551] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU.
 WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -424,17 +424,17 @@ WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU
 [LD_PRELOAD] [01:20:01] [python3.12:545] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:549] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:01] [python3.12:555] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:01] [python3.12:548] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:01] [python3.12:544] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:01 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:01 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:01 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -1377,7 +1377,7 @@ INFO 10-31 01:20:10 [__init__.py:54] - torchtpu -> vllm_torchtpu.platforms:regis
 INFO 10-31 01:20:10 [__init__.py:66] Loading plugin torchtpu
 [LD_PRELOAD] [01:20:10] [python3.12:2774] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2774] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:10 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -1386,22 +1386,22 @@ WARNING 10-31 01:20:10 [tpu_platform.py:1092] Pin memory is not supported on TPU
 [LD_PRELOAD] [01:20:10] [python3.12:2772] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2779] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2781] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:10] [python3.12:2770] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2773] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2772] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:10] [python3.12:2770] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2773] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:10 [tpu_platform.py:1092] Pin memory is not supported on TPU.
 WARNING 10-31 01:20:10 [tpu_platform.py:1092] Pin memory is not supported on TPU.
@@ -1413,11 +1413,11 @@ INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:10 [tpu_platform.py:1092] Pin memory is not supported on TPU.
 [LD_PRELOAD] [01:20:10] [python3.12:2775] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2775] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 [LD_PRELOAD] [01:20:10] [python3.12:2771] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
 [LD_PRELOAD] [01:20:10] [python3.12:2771] Redirecting connect to 169.254.169.254:80 to 127.0.0.1:80
-INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=gke-tpu-b44c435a-5cch | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
+INFO 10-31 01:20:10 [__init__.py:27] TPU info: node_name=tpu-v7x-worker-node | tpu_type=tpu7x-8 | worker_id=0 | num_chips=8 | num_cores_per_chip=2
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 INFO 10-31 01:20:10 [__init__.py:279] Platform plugin torchtpu is activated
 WARNING 10-31 01:20:10 [tpu_platform.py:1092] Pin memory is not supported on TPU.
