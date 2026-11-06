@@ -1,0 +1,61 @@
+{
+  "from_ip": "192.168.100.198",
+  "to_ip": "192.168.100.43",
+  "ports": {
+    "8000": {
+      "ok": true,
+      "rtt_ms": 1.336,
+      "resp": "ACK:8000:PING"
+    },
+    "8400": {
+      "ok": true,
+      "rtt_ms": 1.198,
+      "resp": "ACK:8400:PING"
+    },
+    "9400": {
+      "ok": true,
+      "rtt_ms": 0.692,
+      "resp": "ACK:9400:PING"
+    },
+    "14579": {
+      "ok": true,
+      "rtt_ms": 0.872,
+      "resp": "ACK:14579:PING"
+    },
+    "9100": {
+      "ok": true,
+      "rtt_ms": 0.549,
+      "resp": "ACK:9100:PING"
+    },
+    "9200": {
+      "ok": true,
+      "rtt_ms": 0.237,
+      "resp": "ACK:9200:PING"
+    },
+    "9600": {
+      "ok": true,
+      "rtt_ms": 0.584,
+      "resp": "ACK:9600:PING"
+    },
+    "27000": {
+      "ok": true,
+      "rtt_ms": 0.43,
+      "resp": "ACK:27000:PING"
+    },
+    "27100": {
+      "ok": true,
+      "rtt_ms": 0.433,
+      "resp": "ACK:27100:PING"
+    },
+    "28000": {
+      "ok": true,
+      "rtt_ms": 0.715,
+      "resp": "ACK:28000:PING"
+    },
+    "28100": {
+      "ok": true,
+      "rtt_ms": 0.459,
+      "resp": "ACK:28100:PING"
+    }
+  }
+}

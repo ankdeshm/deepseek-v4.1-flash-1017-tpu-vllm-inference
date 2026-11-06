@@ -1,0 +1,142 @@
+{
+  "num_requests": 10,
+  "all_http_200": true,
+  "all_sane_output": false,
+  "failures": 10,
+  "wall_s": 7.987,
+  "total_completion_tokens": 1920,
+  "aggregate_out_tok_s": 240.38,
+  "dspark_num_drafts": 752.0,
+  "dspark_num_accepted": 1186.0,
+  "dspark_tau": 2.5771,
+  "dspark_per_pos_accept_rates": {
+    "0": 0.6676,
+    "1": 0.4269,
+    "2": 0.2566,
+    "3": 0.1489,
+    "4": 0.0771
+  },
+  "preemptions_delta": 0.0,
+  "requests": [
+    {
+      "idx": 0,
+      "status": 200,
+      "prompt": "Explain how Multi-head Latent Attention (MLA) reduces KV cache memory bandwidth during autoregressiv",
+      "prompt_tokens": 60,
+      "completion_tokens": 192,
+      "ttft_ms": 4133.5,
+      "wall_s": 4.134,
+      "per_user_tok_s": 46.45,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 1,
+      "status": 200,
+      "prompt": "Write a concise Python implementation of consistent prefix hashing with bounded load for routing LLM",
+      "prompt_tokens": 54,
+      "completion_tokens": 192,
+      "ttft_ms": 4212.94,
+      "wall_s": 4.213,
+      "per_user_tok_s": 45.57,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 2,
+      "status": 200,
+      "prompt": "Compare Expert Parallelism EP=8 versus EP=16 for a 384-expert top-6 MoE model: how do weight bytes r",
+      "prompt_tokens": 69,
+      "completion_tokens": 192,
+      "ttft_ms": 4269.39,
+      "wall_s": 4.269,
+      "per_user_tok_s": 44.97,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 3,
+      "status": 200,
+      "prompt": "Summarize the three main phases of Kubernetes Gateway API Inference Extension endpoint selection whe",
+      "prompt_tokens": 56,
+      "completion_tokens": 192,
+      "ttft_ms": 4370.71,
+      "wall_s": 4.371,
+      "per_user_tok_s": 43.93,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 4,
+      "status": 200,
+      "prompt": "Derive the expected tokens generated per verification step in speculative decoding with draft length",
+      "prompt_tokens": 79,
+      "completion_tokens": 192,
+      "ttft_ms": 4186.19,
+      "wall_s": 4.186,
+      "per_user_tok_s": 45.87,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 5,
+      "status": 200,
+      "prompt": "List 12 major rivers in North America, the mountain ranges or lakes where they originate, and the bo",
+      "prompt_tokens": 58,
+      "completion_tokens": 192,
+      "ttft_ms": 3190.11,
+      "wall_s": 3.19,
+      "per_user_tok_s": 60.19,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 6,
+      "status": 200,
+      "prompt": "Write an ANSI SQL query using window functions to compute rolling 7-day P50 and P95 request latency ",
+      "prompt_tokens": 61,
+      "completion_tokens": 192,
+      "ttft_ms": 2924.26,
+      "wall_s": 2.924,
+      "per_user_tok_s": 65.66,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 7,
+      "status": 200,
+      "prompt": "Explain why block-scaled microscaling formats (MXFP4 with UE8M0 32-element shared exponents) preserv",
+      "prompt_tokens": 63,
+      "completion_tokens": 192,
+      "ttft_ms": 3341.72,
+      "wall_s": 3.342,
+      "per_user_tok_s": 57.46,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 8,
+      "status": 200,
+      "prompt": "Describe the TCP congestion control differences between CUBIC and BBRv2 on intra-datacenter 200 Gbps",
+      "prompt_tokens": 63,
+      "completion_tokens": 192,
+      "ttft_ms": 3714.65,
+      "wall_s": 3.715,
+      "per_user_tok_s": 51.69,
+      "output_preview": "",
+      "sane": false
+    },
+    {
+      "idx": 9,
+      "status": 200,
+      "prompt": "Provide a step-by-step checklist for diagnosing XLA HLO compilation cache misses across multi-proces",
+      "prompt_tokens": 58,
+      "completion_tokens": 192,
+      "ttft_ms": 3485.83,
+      "wall_s": 3.486,
+      "per_user_tok_s": 55.08,
+      "output_preview": "",
+      "sane": false
+    }
+  ]
+}

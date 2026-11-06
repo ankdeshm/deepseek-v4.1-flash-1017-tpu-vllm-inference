@@ -1,0 +1,43 @@
+{
+  "launch_cmd": "[PD-LAUNCH] cmd: vllm serve /dev/shm/DeepSeek-V4.1-Flash --host 0.0.0.0 --port 8400 --served-model-name deepseek-ai/DeepSeek-V4.1-Flash --trust-remote-code --api-server-count 8 --renderer-num-workers 4 --prefill-schedule-interval 1 --data-parallel-size 8 --data-parallel-size-local 8 --tensor-parallel-size 1 --enable-expert-parallel --kv-cache-dtype fp8 --max-model-len 131072 --max-num-seqs 64 --max-num-batched-tokens 8192 --gpu-memory-utilization 0.85 --no-disable-hybrid-kv-cache-manager --enable-prompt-tokens-details --enable-prefix-caching --prefix-cache-retention-interval 1024 --enable-auto-tool-choice --tool-call-parser deepseek_v41 --reasoning-parser deepseek_v41 --no-async-scheduling --kv-transfer-config \\{\\\"kv_connector\\\":\\\"TPURaidenConnector\\\"\\,\\\"kv_connector_module_path\\\":\\\"vllm_torchtpu.distributed.kv_transfer.tpu_connector\\\"\\,\\\"kv_role\\\":\\\"kv_producer\\\"\\,\\\"kv_port\\\":14579\\} --compilation-config \\{\\\"compile_sizes\\\":\\ \\[512\\,\\ 2048\\,\\ 8192\\]\\}",
+  "vllm_weight_load_seconds_per_worker": [
+    54.16
+  ],
+  "vllm_weight_load_seconds_min": 54.16,
+  "vllm_weight_load_seconds_max": 54.16,
+  "precision_and_memory_log_lines": [
+    "INFO 11-06 20:48:56 [config.py:928] Detected quantization_config.scale_fmt=ue8m0; enabling UE8M0 for DeepGEMM.",
+    "INFO 11-06 20:49:05 [cache.py:363] Using fp8 data type to store kv cache. It reduces the GPU memory footprint and boosts the performance. Meanwhile, it may cause accuracy drop without a proper scaling factor",
+    "(Worker_DP4_EP4 pid=2801) INFO 11-06 20:49:43 [tpu_runner.py:5307] Setting TPU quantization config for: deepseek_v4_fp8",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:49:43 [quant_config.py:75] DeepSeek V4 expert_dtype resolved to 'fp4'",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:39 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[5120, 1792], weight_dtype=float8_e4m3fn, scale=[1792], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:39 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[1280, 32768], weight_dtype=float8_e4m3fn, scale=[32768], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:39 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[4096, 8192], weight_dtype=float8_e4m3fn, scale=[8192], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:39 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[8192, 5120], weight_dtype=float8_e4m3fn, scale=[5120], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:39 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[5120, 4608], weight_dtype=float8_e4m3fn, scale=[4608], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:39 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[2304, 5120], weight_dtype=float8_e4m3fn, scale=[5120], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:51 [fused_moe_ep.py:1004] Fused EP MoE armed | hidden=5120 inter=2560 local_experts=48 ep=8 pcp=1 topk=6 capacity=128 sharded_plan=True format=fp4 rhs_qb=512 act=silu_and_mul_with_clamp scoring=sqrtsoftplus score_bias=True hash_routing=False precomputed_routing=False routed_scale=1.0 token_replica_groups=None",
+    "(Worker_DP0_EP0 pid=2795) WARNING 11-06 20:50:51 [fused_moe_ep.py:1028] Fused EP MoE armed, so TPU_MOE_SKIP_PADDED_TOKENS=False and TPU_MOE_COLLECTION_CHUNK_SIZE=8192 are not in effect for this layer: the kernel routes and exchanges inside its own program.",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 20:50:53 [mxfp4.py:1186] DeepSeek-V4 MXFP4 weights processed and stored as native FP4 for GMM kernel.",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:50:54 [mxfp4.py:1255] DeepSeek-V4 MXFP4 fused EP W4A8 enabled: block-512",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:51:09 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[6144, 25600], weight_dtype=float8_e4m3fn, scale=[25600], requant_block_size=per-channel",
+    "(Worker_DP0_EP0 pid=2795) INFO 11-06 20:51:10 [fp8.py:1392] FP8 linear weights requantized for runtime: shape=[1280, 4096], weight_dtype=float8_e4m3fn, scale=[4096], requant_block_size=per-channel",
+    "(Worker_DP2_EP2 pid=2791) INFO 11-06 21:02:44 [tpu_worker.py:518] Memory statistics | total_hbm_limit_gb=94.74GiB | total_hbm_limit_cap_gb=80.53GiB | total_hbm_used_gb=46.27GiB | kv_connector_hbm_reserve_gb=0.0GiB | total_hbm_avail_gb=34.25GiB",
+    "(EngineCore_DP2 pid=584) INFO 11-06 21:02:44 [kv_cache_utils.py:2454] TPU KV cache size: 1,464,212 tokens, Maximum concurrency for 131,072 tokens per request: 11.17x",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2984] Raiden DSv4 pool admission complete topology=dp8_prefill role=kv_producer binding=private_typed pools=55 storages=26 tags=13",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.swa.s512x1x128.g0 plan_position=0 page_tokens=128 live_bytes_per_block=262144 row_bytes=512 pools=3 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.swa.s256x1x128.g0 plan_position=0 page_tokens=128 live_bytes_per_block=131072 row_bytes=512 pools=11 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.swa.s512x1x128.g1 plan_position=1 page_tokens=128 live_bytes_per_block=262144 row_bytes=512 pools=3 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.swa.s256x1x128.g1 plan_position=1 page_tokens=128 live_bytes_per_block=131072 row_bytes=512 pools=10 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.swa.s512x1x128.g2 plan_position=2 page_tokens=128 live_bytes_per_block=262144 row_bytes=512 pools=3 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.swa.s256x1x128.g2 plan_position=2 page_tokens=128 live_bytes_per_block=131072 row_bytes=512 pools=10 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.csa.nope.s512x1x128.g3 plan_position=3 page_tokens=1024 live_bytes_per_block=262144 row_bytes=512 pools=3 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.csa.rope.s128x1x128.g3 plan_position=3 page_tokens=1024 live_bytes_per_block=65536 row_bytes=512 pools=3 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.idx.s33x4x512.g3 plan_position=3 page_tokens=1024 live_bytes_per_block=67584 row_bytes=2048 pools=3 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.csa.nope.s1024x1x128.g3 plan_position=3 page_tokens=1024 live_bytes_per_block=524288 row_bytes=512 pools=1 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.csa.rope.s256x1x128.g3 plan_position=3 page_tokens=1024 live_bytes_per_block=131072 row_bytes=512 pools=1 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.idx.s33x4x1024.g3 plan_position=3 page_tokens=1024 live_bytes_per_block=135168 row_bytes=4096 pools=1 whole_tail_page=True",
+    "(Worker_DP5_EP5 pid=2790) INFO 11-06 21:02:52 [tpu_connector.py:2995] Raiden DSv4 pool tag=dsv4.state.csa.g4 plan_position=4 page_tokens=64 live_bytes_per_block=262144 row_bytes=512 pools=3 whole_tail_page=True"
+  ],
+  "boot_healthy_s": 1248.36
+}

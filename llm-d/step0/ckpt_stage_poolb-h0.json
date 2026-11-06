@@ -1,0 +1,29 @@
+{
+  "setup_wall_s": 161.48,
+  "ckpt_bytes": 510310755720,
+  "ckpt_gcs_to_shm_s": 161.32,
+  "ckpt_gcs_gb_per_s": 3.16,
+  "pd_env": {
+    "ADVERTISE_HOST": "192.168.100.198",
+    "RUN_ID": "step0_preflight_20261106",
+    "CED_PREFILL": "0",
+    "MAX_NUM_SEQS": "48",
+    "MAX_NUM_BATCHED_TOKENS": "288",
+    "COMPILE_SIZES": "[16, 40, 48, 64, 96, 192, 288]",
+    "ENABLE_DSPARK": "1",
+    "DSPARK_TOKENS": "5",
+    "ASYNC_SCHEDULING": "1",
+    "GPU_MEMORY_UTILIZATION": "0.85"
+  },
+  "model_config_quantization": {
+    "quant_method": "fp8",
+    "activation_scheme": "dynamic",
+    "weight_block_size": [
+      32,
+      32
+    ],
+    "scale_fmt": "ue8m0",
+    "expert_dtype": "fp4"
+  },
+  "model_config_dtype": "bfloat16"
+}

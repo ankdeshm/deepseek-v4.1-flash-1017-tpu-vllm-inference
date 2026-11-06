@@ -1,0 +1,114 @@
+{
+  "num_requests": 10,
+  "all_http_200": true,
+  "all_sane_output": true,
+  "wall_s": 3.038,
+  "total_completion_tokens": 1215,
+  "aggregate_out_tok_s": 399.94,
+  "dspark_num_drafts": 0,
+  "dspark_num_accepted": 0,
+  "dspark_tau": null,
+  "preemptions_delta": 0.0,
+  "requests": [
+    {
+      "idx": 0,
+      "status": 200,
+      "prompt_tokens": 24,
+      "completion_tokens": 128,
+      "wall_s": 2.52,
+      "per_user_tok_s": 50.8,
+      "output_preview": "# Multi-head Latent Attention (MLA) and KV Cache Bandwidth Reduction\n\n*Note: \"Latent\" appears to be a typo for \"Latent\" \u2192 likely \"Latent\" = \"Latent\" ... I'll assume you mean **Multi-head Latent Attention** as introduced ",
+      "sane": true
+    },
+    {
+      "idx": 1,
+      "status": 200,
+      "prompt_tokens": 17,
+      "completion_tokens": 128,
+      "wall_s": 1.514,
+      "per_user_tok_s": 84.53,
+      "output_preview": "# Binary Search\n\n```python\ndef binary_search(arr, target):\n    \"\"\"Return index of target in sorted list arr, or -1 if not found.\"\"\"\n    lo, hi = 0, len(arr) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if",
+      "sane": true
+    },
+    {
+      "idx": 2,
+      "status": 200,
+      "prompt_tokens": 33,
+      "completion_tokens": 128,
+      "wall_s": 2.78,
+      "per_user_tok_s": 46.05,
+      "output_preview": "- **EP=8:** Each GPU hosts 48 experts (384/8), so top-6 routing touches at most 6 local experts per token; all-to-all dispatch is limited to 8 ranks, giving lower communication volume and simpler collectives, but each GP",
+      "sane": true
+    },
+    {
+      "idx": 3,
+      "status": 200,
+      "prompt_tokens": 20,
+      "completion_tokens": 128,
+      "wall_s": 2.486,
+      "per_user_tok_s": 51.49,
+      "output_preview": "- **Filtering:** The EndpointSlice controller (or legacy Endpoints controller) evaluates all pods matching a Service's label selector and excludes those that are not ready, have terminating status, or fail other readines",
+      "sane": true
+    },
+    {
+      "idx": 4,
+      "status": 200,
+      "prompt_tokens": 25,
+      "completion_tokens": 128,
+      "wall_s": 2.884,
+      "per_user_tok_s": 44.38,
+      "output_preview": "The formula for expected tokens per verification step in speculative decoding is:\n\n\\[\nE[\\text{tokens}] = \\frac{1 - \\alpha^{K+1}}{1 - \\alpha}\n\\]\n\nwhere:\n\n- \\(\\alpha\\) = acceptance rate (probability that a drafted token is",
+      "sane": true
+    },
+    {
+      "idx": 5,
+      "status": 200,
+      "prompt_tokens": 17,
+      "completion_tokens": 128,
+      "wall_s": 2.647,
+      "per_user_tok_s": 48.35,
+      "output_preview": "Here are 5 major rivers in North America and where they empty:\n\n1. **Mississippi River** \u2013 Empties into the Gulf of Mexico (near New Orleans, Louisiana, USA).\n2. **Missouri River** \u2013 Empties into the Mississippi River (n",
+      "sane": true
+    },
+    {
+      "idx": 6,
+      "status": 200,
+      "prompt_tokens": 24,
+      "completion_tokens": 128,
+      "wall_s": 2.162,
+      "per_user_tok_s": 59.2,
+      "output_preview": "# SQL Query: 7-Day Rolling Average with AVG() OVER\n\nI believe you meant **`AVG()`** as a typo for **`AVG()`** \u2014 the standard SQL aggregate is **`AVG()`**... actually, the correct function name is **`AVG()`**? Let me clar",
+      "sane": true
+    },
+    {
+      "idx": 7,
+      "status": 200,
+      "prompt_tokens": 18,
+      "completion_tokens": 71,
+      "wall_s": 2.023,
+      "per_user_tok_s": 35.1,
+      "output_preview": "MXFP4 uses shared block exponents because grouping multiple low-precision mantissas under a single exponent per block reduces the storage overhead of exponent bits, allowing more of the fixed bit budget to be spent on ma",
+      "sane": true
+    },
+    {
+      "idx": 8,
+      "status": 200,
+      "prompt_tokens": 19,
+      "completion_tokens": 120,
+      "wall_s": 2.883,
+      "per_user_tok_s": 41.62,
+      "output_preview": "CUBIC (a variant of CUBIC/BBR) and BBR are both model-based congestion control algorithms that estimate available bandwidth rather than reacting to packet loss, but CUBIC uses a cubic window growth function tied to a con",
+      "sane": true
+    },
+    {
+      "idx": 9,
+      "status": 200,
+      "prompt_tokens": 18,
+      "completion_tokens": 128,
+      "wall_s": 3.033,
+      "per_user_tok_s": 42.21,
+      "output_preview": "# Three Reasons XLA Compilation Caches Might Miss Across Runs\n\nXLA (Accelerated Linear Algebra) is Google's compiler for XLA/HLO \u2192 LLO \u2192 machine code, used in JAX and TPU pipelines. Its compilation caches (e.g., the pers",
+      "sane": true
+    }
+  ]
+}
