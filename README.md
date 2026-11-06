@@ -1,56 +1,106 @@
-# `DeepSeek-V4.1-Flash-1017` Disaggregated Serving on TPU `v7x`
+# DeepSeek-V4.1-Flash-1017: Disaggregated Serving on TPU v7x
 
-Disaggregated Prefill-Decode (`1P1D` and `2P2D` via gRPC `TPUConnector` KV-cache transfer) deployment manifests, parallel GCS checkpoint staging, and latency/throughput benchmarks for **[`deepseek-ai/DeepSeek-V4.1-Flash-1017`](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017)** (`48` safetensors shards, `510.31 GB` total) on **TPU v7x (`2x2x4`, 16 chips / 32 TensorCores, `3,072 GiB` HBM3e)** with **`vllm-tpu` (`DeepseekV4ForCausalLM` + `DEEPSEEK_V4_FLASH` Pallas attention + `DSpark` block-5 speculative decoding)**.
+Prefill/decode (P/D) disaggregated serving for [`deepseek-ai/DeepSeek-V4.1-Flash-1017`](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017) on TPU v7x with `vllm-tpu`. The repo includes deployment manifests, parallel checkpoint staging to GCS, and latency/throughput benchmarks for two layouts:
 
-- **Disaggregated Benchmark Summary:** [`results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`summary.json`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/summary.json)
+- **1P1D:** 1 prefill + 1 decode instance (8 chips)
+- **2P2D:** 2 prefill + 2 decode instances (16 chips, full `2x2x4` slice)
 
----
+**Full results:** [`results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`summary.json`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/summary.json)
 
-## 1. Model Architecture & Disaggregated P/D Implementation
-
-| Property | Specification & Code Anchor |
-|---|---|
-| **Hugging Face Checkpoint** | [`https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017`](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017) (`48` shards, `510.31 GB` staged via [`scripts/stage_hf_to_gcs.py`](./scripts/stage_hf_to_gcs.py) & [`k8s/stage-deepseek-v41-job.yaml`](./k8s/stage-deepseek-v41-job.yaml)) |
-| **Architecture & MoE Routing** | `DeepseekV4ForCausalLM` (`40` layers, `hidden_size=5120`, `384` routed `FP4` experts + `1` shared expert, **top-6** `noaux_tc` routing, `32×32` `ue8m0` dynamic block-FP8) |
-| **Attention & Speculative Decoding** | `DEEPSEEK_V4_FLASH` Sparse MLA (`index_topk=512`, `candidate_topk_blocks=2048`) + Engram layers `[1, 14]` + **`DSpark` (`dspark_block_size=5`, `num_speculative_tokens=4`)** |
-| **Disaggregated `1P1D` / `2P2D` Gateway & `TPUConnector`** | Embedded FastAPI P/D router ([`GATEWAY_2P2D_PY` `#L33`](./scripts/run_dsv41_pd_1017.py#L33-L165)) + per-host `TP=8` Prefill/Decode orchestration ([`main()` `#L401`](./scripts/run_dsv41_pd_1017.py#L401-L560)) |
+> ⚠️ **Status:** In this run the P/D correctness hard gates (`pd_gates.py`: 2+2 ×16 and 64-token greedy equality) **did not pass**. The 50-states probe matched (50/50). Treat the throughput numbers below as performance data pending a correctness fix.
 
 ---
 
-## 2. Disaggregated `1P1D` (8 Chips) & `2P2D` (16 Chips) Benchmark Results
+## 1. Model and serving setup
 
-Each Prefill (`P`) or Decode (`D`) instance runs on **1 `tpu7x-standard-4t` host (`2x2x1` = 4 `v7x` chips / 8 TensorCores, `TP=8`)** launched via [`k8s/v7x-16-flex-dsv41-pd-1017.yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml):
-
-| Topology | Chips (`TC`) | Workload (`In : Out`) | Conc | Output TPS | Total TPS (`In + Out`) | Mean Stream TPS | Mean TTFT (ms) | Mean TPOT (ms) | Script & Manifest | Result Files |
-|---|---:|---|---:|---:|---:|---:|---:|---:|---|---|
-| **`1P1D`** | `8` (`16`) | `1,024 : 1,024` *(Interactive)* | `1` | `157.82` | `315.63` | **`166.16`** | `308.6` | **`6.02`** | [`pd_1017.py#L341`](./scripts/run_dsv41_pd_1017.py#L341-L353) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`Gates JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/pd_gates_1p1d.json) · [`80% JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_1p1d_80pct.json) |
-| **`1P1D`** | `8` (`16`) | `4,096 : 1,024` *(Standard)* | `8` | `1,004.58` | `5,022.90` | **`139.04`** | `723.5` | **`7.19`** | [`pd_1017.py#L341`](./scripts/run_dsv41_pd_1017.py#L341-L353) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`80% JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_1p1d_80pct.json) · [`95% JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_1p1d_95pct.json) |
-| **`1P1D`** | `8` (`16`) | `4,096 : 1,024` *(High-Tput)* | `64` | `4,884.19` | `24,420.94` | `96.18` | `3,581.2` | `10.42` | [`pd_1017.py#L341`](./scripts/run_dsv41_pd_1017.py#L341-L353) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_1p1d_80pct.json) |
-| **`1P1D`** | `8` (`16`) | `1,024 : 1,024` *(High-Conc)* | `128` | **`7,446.23`** | `14,892.46` | `80.19` | `2,941.6` | `12.51` | [`pd_1017.py#L341`](./scripts/run_dsv41_pd_1017.py#L341-L353) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`Log`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_1p1d_80pct.log) |
-| **`2P2D`** | `16` (`32`) | `4,096 : 1,024` *(Standard)* | `16` | `2,008.74` | `10,043.70` | **`139.42`** | `741.8` | **`7.17`** | [`pd_1017.py#L354`](./scripts/run_dsv41_pd_1017.py#L354-L370) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`80% JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_2p2d_80pct.json) · [`95% JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_2p2d_95pct.json) |
-| **`2P2D`** | `16` (`32`) | `4,096 : 1,024` *(High-Tput)* | `128` | `9,664.81` | `48,324.05` | `95.44` | `3,642.5` | `10.50` | [`pd_1017.py#L354`](./scripts/run_dsv41_pd_1017.py#L354-L370) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_2p2d_80pct.json) |
-| **`2P2D`** | `16` (`32`) | `1,024 : 1,024` *(High-Conc)* | `256` | **`14,541.52`** | `29,083.04` | `79.31` | `3,018.4` | `12.64` | [`pd_1017.py#L354`](./scripts/run_dsv41_pd_1017.py#L354-L370) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`Log`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_2p2d_80pct.log) |
-| **`2P2D`** | `16` (`32`) | `32,768 : 256` *(32K Context)* | `64` | `4,400.40` | **`567,652.10`** *(`563.3K` in)* | `98.12` | `9,842.0` | `10.21` | [`pd_1017.py#L227`](./scripts/run_dsv41_pd_1017.py#L227-L320) · [`yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | [`SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) · [`95% JSON`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/empirical_2p2d_95pct.json) |
-
-- **Scaling (`1P1D -> 2P2D`):** Scaling from `1P1D` (8 chips) to `2P2D` (16 chips) increases output throughput from **`7,446.2` to `14,541.5` output tok/s (`1.95×`)** while maintaining **`6.02 ms` (`166.16` stream tok/s)** interactive `c=1` TPOT and **`563,251.7` prefill input tok/s** on `32K`-token prompts.
+| Item | Details |
+|:---|:---|
+| **Checkpoint** | [`deepseek-ai/DeepSeek-V4.1-Flash-1017`](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017): 48 safetensors shards, 510.31 GB, staged to GCS with [`scripts/stage_hf_to_gcs.py`](./scripts/stage_hf_to_gcs.py) and [`k8s/stage-deepseek-v41-job.yaml`](./k8s/stage-deepseek-v41-job.yaml) |
+| **Architecture** | `DeepseekV4ForCausalLM`: 40 layers, `hidden_size=5120`, 384 routed MXFP4 experts + 1 shared expert, top-6 routing |
+| **Attention** | `DEEPSEEK_V4_FLASH` sparse attention (Pallas), `index_topk=512` |
+| **Speculative decoding** | DSpark on the decode instance (5 draft positions) |
+| **Prefill** | Context encoder enabled (`CED=1`) |
+| **KV transfer** | `TPURaidenConnector` (Stage 3) between prefill and decode hosts |
+| **Hardware** | TPU v7x `2x2x4` = 16 chips / 32 TensorCores / 3,072 GiB HBM3e |
+| **Instance size** | Each P or D instance runs on one `tpu7x-standard-4t` host (`2x2x1` = 4 chips / 8 TensorCores). Exact parallelism flags are in [`scripts/run_dsv41_pd_1017.py`](./scripts/run_dsv41_pd_1017.py). |
+| **Router** | Embedded FastAPI P/D gateway ([`run_dsv41_pd_1017.py#L33-L165`](./scripts/run_dsv41_pd_1017.py#L33-L165)); orchestration in [`main()`](./scripts/run_dsv41_pd_1017.py#L401-L560) |
 
 ---
 
-## 3. Repository Structure & Quickstart
+## 2. Results
 
-- [`docker/Dockerfile`](./docker/Dockerfile) — `vllm` + `TorchTPU` + `SemiAnalysisAI/InferenceX@f6c1f5b5`
-- [`scripts/run_dsv41_pd_1017.py`](./scripts/run_dsv41_pd_1017.py) — Disaggregated `1P1D` & `2P2D` launcher + `TPUConnector` proxy + benchmark suite
-- [`scripts/run_tpu_benchmark_sweep.py`](./scripts/run_tpu_benchmark_sweep.py) — OpenAI SSE streaming + `0%/80%/95%` prefix-cache + `InferenceX` driver
-- [`scripts/stage_hf_to_gcs.py`](./scripts/stage_hf_to_gcs.py) — Parallel 48-shard Hugging Face -> GCS checkpoint stager
-- [`k8s/v7x-16-flex-dsv41-pd-1017.yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) — **4-host Indexed Job running `1P1D` & `2P2D` on TPU `v7x-16`**
-- [`k8s/v7x-16-deepseek-v41-flash-1017.yaml`](./k8s/v7x-16-deepseek-v41-flash-1017.yaml), [`k8s/stage-deepseek-v41-job.yaml`](./k8s/stage-deepseek-v41-job.yaml), [`k8s/storage-gcsfuse.yaml`](./k8s/storage-gcsfuse.yaml)
-- [`results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) — Complete `1P1D` & `2P2D` JSON, log & `SUMMARY.md` outputs
+All throughput values are **output** tokens per second. "Per chip" divides by all chips (prefill + decode). Per-user speed and latency values are **medians**.
+
+### 2.1 Agentic workload (multi-turn, ~18K-token prompts, natural stopping)
+
+Input-length mix 50:20:12:9:9 across buckets 1–8K / 8–16K / 16–32K / 32–64K / 64K+, with a synthetic shared-prefix cache. Highest-throughput row for each layout and cache target:
+
+| Layout | Chips | Cache hit | Sessions | Mean ISL : OSL | Output tok/s | Per chip | Per decode chip | Per-user tok/s | TTFT (s) | OK / Total |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| 1P1D | 8 | 94.4% | 128 | 17,934 : 484 | **7,446.2** | 931 | 1,862 | 69.10 | 1.27 | 1,462 / 1,462 |
+| 1P1D | 8 | 75.2% | 128 | 18,796 : 670 | 6,848.4 | 856 | 1,712 | 69.19 | 1.85 | 1,339 / 1,339 |
+| 2P2D | 16 | 94.7% | 256 | 17,905 : 488 | **14,541.5** | 909 | 1,818 | 67.55 | 1.29 | 2,874 / 2,874 |
+| 2P2D | 16 | 76.8% | 256 | 18,812 : 691 | 14,389.6 | 899 | 1,799 | 71.15 | 1.85 | 2,675 / 2,675 |
+
+At lower concurrency, per-user speed is higher. For example, 1P1D at n=8 runs at 111.8–119.5 tok/s per user, with TTFT of 0.32–0.91 s. See [`SUMMARY.md`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) for full sweeps.
+
+### 2.2 Fixed-shape probes (InferenceX-style, random prompts)
+
+| Layout | Chips | Shape (ISL : OSL) | Concurrency | Output tok/s | Per chip | Per-user tok/s | TPOT (ms) | TTFT (ms) | OK / Total |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| 1P1D | 8 | 1024 : 512 | 1 | 136.55 | 17.1 | 144.93 | 6.94 | 250.85 | 4 / 4 |
+| 1P1D | 8 | 1024 : 512 | 8 | 898.42 | 112.3 | 136.97 | 7.30 | 471.72 | 16 / 16 |
+| 1P1D | 8 | 4096 : 1024 | 8 | 874.48 | 109.3 | **166.16** | **6.02** | 843.16 | 16 / 16 |
+| 1P1D | 8 | 4096 : 1024 | 64 | **5,224.30** | 653.0 | 139.37 | 7.18 | 2,102.42 | 64 / 64 |
+| 2P2D | 16 | 1024 : 512 | 16 | 1,721.48 | 107.6 | 139.86 | 7.15 | 420.25 | 32 / 32 |
+| 2P2D | 16 | 4096 : 1024 | 16 | 2,076.33 | 129.8 | 164.92 | 6.06 | 1,213.43 | 32 / 32 |
+| 2P2D | 16 | 4096 : 1024 | 128 | **8,251.62** | 515.7 | 136.93 | 7.30 | 2,324.55 | 128 / 128 |
+
+### 2.3 Scaling from 1P1D to 2P2D
+
+| Workload | 1P1D (8 chips) | 2P2D (16 chips) | Scaling |
+|:---|:---|:---|:---|
+| Agentic, ~95% cache hit (n=128 → 256) | 7,446.2 tok/s | 14,541.5 tok/s | **1.95×** |
+| Agentic, ~75–77% cache hit (n=128 → 256) | 6,848.4 tok/s | 14,389.6 tok/s | **2.10×** |
+| Fixed-shape 1024:512 (c=8 → 16) | 898.42 tok/s | 1,721.48 tok/s | **1.92×** |
+| Fixed-shape 4096:1024 (c=64 → 128) | 5,224.30 tok/s | 8,251.62 tok/s | **1.58×** |
+
+2P2D runs two independent 1P1D pairs behind one router. It adds capacity at roughly constant per-chip efficiency (agentic, ~95% hit: 931 → 909 output tok/s per chip).
+
+### 2.4 Known limitations
+
+- **Correctness gate:** P/D vs. local greedy-equality hard gates failed in this run (see status note above).
+- **Synthetic cache:** prompts reuse pre-seeded shared prefixes. Above ~128 distinct prefixes per prefill node, the realized cache hit rate drops.
+- **Throughput vs. per-user speed:** the highest-throughput rows run at ~68–71 tok/s per user. Higher per-user speed (110–166 tok/s) comes at lower concurrency.
+- **Small samples:** low-concurrency fixed-shape probes completed only 4–16 requests each.
+- **Speculative acceptance:** not recorded in the sweep tables. Probes show mean accept lengths of 2.08–2.69.
+
+---
+
+## 3. Repository structure
+
+| Path | Purpose |
+|:---|:---|
+| [`docker/Dockerfile`](./docker/Dockerfile) | `vllm` + TorchTPU + [`SemiAnalysisAI/InferenceX@f6c1f5b5`](https://github.com/SemiAnalysisAI/InferenceX) |
+| [`scripts/run_dsv41_pd_1017.py`](./scripts/run_dsv41_pd_1017.py) | 1P1D / 2P2D launcher, P/D router, and benchmark suite |
+| [`scripts/run_tpu_benchmark_sweep.py`](./scripts/run_tpu_benchmark_sweep.py) | OpenAI-compatible streaming benchmark driver: 0% / 80% / 95% prefix-cache sweeps plus InferenceX shapes |
+| [`scripts/stage_hf_to_gcs.py`](./scripts/stage_hf_to_gcs.py) | Parallel 48-shard Hugging Face → GCS checkpoint stager |
+| [`k8s/v7x-16-flex-dsv41-pd-1017.yaml`](./k8s/v7x-16-flex-dsv41-pd-1017.yaml) | 4-host Indexed Job running 1P1D and 2P2D on TPU v7x-16 |
+| [`k8s/v7x-16-deepseek-v41-flash-1017.yaml`](./k8s/v7x-16-deepseek-v41-flash-1017.yaml) | Single-deployment manifest |
+| [`k8s/stage-deepseek-v41-job.yaml`](./k8s/stage-deepseek-v41-job.yaml) | Checkpoint staging job |
+| [`k8s/storage-gcsfuse.yaml`](./k8s/storage-gcsfuse.yaml) | GCS FUSE storage |
+| [`results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/`](./results/v7x-16-dsv41-1017-pd__20261031_1p1d_2p2d/SUMMARY.md) | Full 1P1D and 2P2D JSON, logs, and `SUMMARY.md` |
+
+---
+
+## 4. Quickstart
 
 ```bash
 # 1. Stage deepseek-ai/DeepSeek-V4.1-Flash-1017 (510.31 GB, 48 shards) to GCS
 kubectl apply -f k8s/stage-deepseek-v41-job.yaml
 
-# 2. Deploy Disaggregated 1P1D & 2P2D Runner ConfigMap & Job on TPU v7x-16
-kubectl create configmap dsv41-pd-script --from-file=run_dsv41_pd_1017.py=scripts/run_dsv41_pd_1017.py
+# 2. Deploy the 1P1D and 2P2D runner (ConfigMap + Job) on TPU v7x-16
+kubectl create configmap dsv41-pd-script \
+  --from-file=run_dsv41_pd_1017.py=scripts/run_dsv41_pd_1017.py
 kubectl apply -f k8s/v7x-16-flex-dsv41-pd-1017.yaml
 ```
