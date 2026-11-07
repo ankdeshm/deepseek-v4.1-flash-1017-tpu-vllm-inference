@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T08:17:51Z`
+- **Last Updated (UTC):** `2026-11-07T08:18:12Z`
 
 ---
 
@@ -21,7 +21,7 @@
 | `2026-11-07T03:54Z` | **STEP 3 `R1b`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`2x4c` `EP=8` Pool B) + `R1` Snapshot** | **COMPLETE (`R1b` Wins `8/8` Levels, Peak `46,822.96` out tok/s)** | Completed ladder `c = 32, 64, 128, 256, 384, 512, 768, 1024` (`300.0 s` window/level, `0.00%` cache hit). Peak **`46,822.96` out tok/s** (**`5,852.87`/dec-chip**, **`2,926.44`/tot-chip**) at `c=1024` (`+14.46%` vs `R1a`), and **`42,719.11` out tok/s** (`5,339.89`/dec-chip, `61.33` tok/s median, `1.284 s` P50 TTFT) at `c=768` (`+13.77%` vs `R1a`; `+93.73%` throughput at `~61 tok/s/user`), `DSpark tau = 3.85..4.18`, **`0 / 58,296` failures**. Published `R1_INTERIM_SNAPSHOT.md`: **`2 x 4c EP=8` wins `8/8` levels (`+13.3%..+46.3%`)**. | Proceed to Step 4 `R2` (`S2`/`S3` multi-shape sweep on winning `2x4c EP=8` Decode). |
 | `2026-11-07T05:21Z` | **STEP 3 `R2`: Matched-Shape Sweep (`S2=1024:1024`, `S3=8192:1024`, `2P2D` `EP=8`)** | **COMPLETE (`S2` & `S3` Done)** | **`S2` (`1024:1024`):** `c=32,64,128,256,384,512,768,1024` done, peak **`44,166.04` out tok/s** (`5,520.76`/dec-chip @ `c=1024`, `0/56,152` err) · **`S3` (`8192:1024`):** `c=32,64,128,256,384,512,768` done, peak **`26,229.45` out tok/s** (`3,278.68`/dec-chip, `214,794` in tok/s @ `c=512`, `0/37,360` err). | Publish `r2_summary.md` & launch Step 3 `R3` (`Decode-Only Ceiling`). |
 | `2026-11-07T05:52Z` | **STEP 3 `R3`: Decode-Only Ceiling (`S1` `~99.5%` Cached, `2P2D` `EP=8`)** | **COMPLETE (Ceiling `44,100.66` out tok/s @ `c=1024`)** | Swept `c = 256, 384, 512, 768, 1024` (`~99.5%` prefix hit, Prefill `<5%` busy). True Decode Ceiling **`44,100.66` out tok/s** (**`5,512.58`/dec-chip**, **`2,756.29`/tot-chip**) at `c=1024`, `DSpark tau = 4.14..4.15`, `0 / 47,647` failures. | Proceed to Step 4 `R4` (`Agentic Prefix-Aware Routing`). |
-| `2026-11-07T08:17Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **IN PROGRESS** | `roundrobin` (n=?,?,?): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=?,?,?): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | Next routing condition / R4 summary. |
+| `2026-11-07T08:18Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **COMPLETE (4 conditions)** | `roundrobin` (n=?,?,?): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=?,?,?): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | Proceed to `R6`, then `R5`. |
 
 
 ---
@@ -169,3 +169,13 @@
 | `roundrobin_dppin` | `?` | `600` s | **`48.29%`** / `48.29%` | **`1.824 / 44.134 / 49.222`** | **`5,722.09`** | `715.26` | `357.63` | `160,123.27` | `90.92 / 77.35 / 73.99` | `18,821.8 / 697.4` | `—` | `P 0.0 / D 0.0` | `0 / 5019` |
 | `roundrobin_dppin` | `?` | `600` s | **`49.90%`** / `49.90%` | **`1.878 / 99.133 / 129.498`** | **`6,768.88`** | `846.11` | `423.05` | `184,793.75` | `86.81 / 62.73 / 55.98` | `18,815.0 / 713.3` | `—` | `P 0.0 / D 0.0` | `0 / 5934` |
 <!-- R4_RESULTS_END -->
+
+<!-- R4_NOTE_START -->
+- **Why (a)/(b) realize only a few % hit:** each Pool A prefill instance is one `DP=8` vLLM server behind one endpoint. The `EndpointPicker` chooses the *pod*;
+  vLLM's internal DP load balancer then picks one of `8` ranks, each with its own prefix cache, without looking at the prefix. A trunk's turns therefore land on a
+  different rank most of the time, so pod-level prefix-aware routing cannot reach the `80%` target on this deployment.
+- **(c) `prefix_aware_dppin` / (d) `roundrobin_dppin`:** same workload with client-side DP-rank affinity (`X-data-parallel-rank = trunk_id % 8`, verified end-to-end through
+  `EPP -> disagg sidecar -> prefill vLLM`: rank-matched probes `8,192-9,216` cached tokens, rank-mismatched probe `0`). This is the mechanism `toy_proxy_server.py` used for `R0` and
+  the prior `7,446 / 14,542` runs. (c) vs (d) isolates the value of `llm-d` prefix-aware *pod* selection once rank-level affinity exists; it approximates what exposing each DP
+  rank as its own `InferencePool` endpoint would give the `EndpointPicker`.
+<!-- R4_NOTE_END -->
