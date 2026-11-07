@@ -51,6 +51,11 @@ except ImportError:  # pragma: no cover - present in in-cluster vllm/benchmark i
 
 CHARS_PER_TOKEN = 3.85
 
+# Optional client-side DP-rank affinity (same mechanism as ref_stack/toy_proxy_server.py used by R0 and
+# the prior 7,446 / 14,542 runs): X-data-parallel-rank = trunk_id % DP_PIN_RANKS on every request.
+# 0 = disabled (vLLM's internal DP load balancer picks the rank inside each prefill/decode instance).
+DP_PIN_RANKS = 0
+
 ISL_BUCKETS = [
     ("1-8K", 0.50, 5376, 8064),
     ("8-16K", 0.20, 8320, 15872),
@@ -366,6 +371,8 @@ async def send_chat_request(
     headers = {
         "X-Session-ID": f"trunk-{meta.get('trunk_id', 0)}",
     }
+    if DP_PIN_RANKS > 0:
+        headers["X-data-parallel-rank"] = str(int(meta.get("trunk_id", 0)) % DP_PIN_RANKS)
     if extra_headers:
         headers.update(extra_headers)
 
@@ -1074,6 +1081,8 @@ async def run_concurrency_level(
 
 
 async def main_async(args: argparse.Namespace) -> None:
+    global DP_PIN_RANKS
+    DP_PIN_RANKS = int(getattr(args, "dp_pin_ranks", 0) or 0)
     concurrencies = [int(x.strip()) for x in args.sessions.split(",") if x.strip()]
     prefill_urls = [x.strip() for x in args.prefill_metrics_urls.split(",") if x.strip()]
     decode_urls = [x.strip() for x in args.decode_metrics_urls.split(",") if x.strip()]
@@ -1149,6 +1158,7 @@ async def main_async(args: argparse.Namespace) -> None:
                 "bucket_trunk_counts": bucket_counts,
                 "target_cache_hit_ratio": args.cache_hit_rate,
                 "reset_cache_between_levels": False,
+                "dp_pin_ranks": DP_PIN_RANKS,
                 "warmup": warmup_summary,
                 "levels": level_summaries,
             }
@@ -1193,6 +1203,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--timeout", type=float, default=3600.0)
     ap.add_argument("--save-requests-dir", default="")
     ap.add_argument("--output-json", default="/tmp/r4_summary.json")
+    ap.add_argument("--dp-pin-ranks", type=int, default=0,
+                    help="0=off; N>0 adds X-data-parallel-rank=trunk_id%%N (client DP affinity, as in toy_proxy_server.py)")
     return ap.parse_args()
 
 
