@@ -17,7 +17,7 @@ MARKER_START = "<!-- R1A_RESULTS_START -->"
 MARKER_END = "<!-- R1A_RESULTS_END -->"
 
 
-def fmt_row(s: dict) -> str:
+def fmt_row(s: dict, is_last: bool) -> str:
     c = s["concurrency"]
     win_s = s["window"]["steady_window_s"]
     tp = s["throughput"]
@@ -41,7 +41,7 @@ def fmt_row(s: dict) -> str:
     h1_pct = p_pods.get("h1", {}).get("requests_share_pct", 0.0)
     srv_gen = tp.get("server_gen_tok_s_60_290")
     srv_s = f"`{srv_gen:,.1f}`" if srv_gen is not None else "—"
-    stop_flag = " **STOP**" if s["stop_evaluation"]["should_stop"] else ""
+    stop_flag = " **STOP**" if (is_last and s["stop_evaluation"]["should_stop"]) else ""
 
     return (
         f"| **`c={c}`**{stop_flag} | `{win_s:.0f} s` | **`{tp['steady_out_tok_s']:,.2f}`**{gain_s} | "
@@ -72,6 +72,24 @@ def main() -> int:
         return 0
 
     levels = [json.loads(p.read_text(encoding="utf-8")) for p in level_files]
+    sweep_summary_path = R1A_DIR / "r1a_s1_sweep_summary.json"
+    sweep_summary_path.write_text(
+        json.dumps(
+            {
+                "run_name": "r1a",
+                "shape_name": "s1",
+                "ep_per_decode_instance": 16,
+                "calibrated_word_count": 2048,
+                "completed_concurrencies": [s["concurrency"] for s in levels],
+                "stopped_early": levels[-1]["stop_evaluation"]["should_stop"],
+                "stop_reasons": levels[-1]["stop_evaluation"]["reasons"],
+                "levels": levels,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     now_utc = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     sweep_done = levels[-1]["stop_evaluation"]["should_stop"] or (
@@ -105,8 +123,8 @@ def main() -> int:
         "| Level | Window | Steady Out tok/s (Gain) | Out tok/s / Dec Chip (`/8`) | Out tok/s / Tot Chip (`/16`) | Server Gen tok/s (`60-290s`) | Total (`in+out`) tok/s | Per-User tok/s `Med / P90_low / P95_low` (In-Win \\| All) | TTFT `P50 / P95 / P99` (s) All-Reqs | TTFT `P50 / P95 / P99` (s) In-Window | TPOT `P50 / P95 / P99` (ms) All-Reqs | `DSpark` $\\tau$ | Decode Batch / DP Rank (`mean / med / max`) | KV Usage % `Steady / Peak-Rank` | Prefill Split (`h0 / h1`) | Preempt (`P / D`) | Failures |",
         "|---|---:|---:|---:|---:|---:|---:|---|---|---|---|---|---:|---|---|---|---:|---:|",
     ]
-    for s in levels:
-        section_lines.append(fmt_row(s))
+    for i, s in enumerate(levels):
+        section_lines.append(fmt_row(s, is_last=(i == len(levels) - 1)))
 
     if levels[-1]["stop_evaluation"]["should_stop"]:
         reasons_str = "; ".join(levels[-1]["stop_evaluation"]["reasons"])
