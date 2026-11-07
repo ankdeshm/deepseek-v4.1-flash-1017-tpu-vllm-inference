@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T02:19:28Z`
+- **Last Updated (UTC):** `2026-11-07T03:11:57Z`
 
 ---
 
@@ -18,6 +18,7 @@
 | `2026-11-07T00:10Z` | **STEP 1: `R0` Reproducibility Anchor (`n=128`, `300 s`)** | **PASS (`7,423.72` out tok/s)** | **PASS GATE (`6,700–8,200` out tok/s, `tau > 2.0`):** Measured **`7,423.72` out tok/s** (`+0.20%` vs prior `A1-b` `7,408.59`; `-0.30%` vs `7,446` anchor), **`1,855.93` out tok/s per decode chip (`/4`)**, **`927.97` out tok/s per total chip (`/8`)**, **`283,403.02` total (`in+out`) tok/s**, **`DSpark tau = 2.8755`**, per-user `Med / P90_low / P95_low = 67.83 / 54.65 / 47.43 tok/s` (in-window), `TTFT P50 / P95 / P99 = 1.205 / 1.559 / 8.731 s` (in-window) & `1.205 / 1.556 / 8.726 s` (all reqs), realized cache hit **`95.47%`**, `0` preemptions, **`0 / 4,631` failures**. | Deploy `2 x 4-chip` `llm-d` Prefill on Pool A (`llmd-prefill-poola-h{0,1}`). |
 | `2026-11-07T01:15Z` | **STEP 2: `llm-d` v1.0.0 Path A + Pool A `2x4c` Prefill + Pool B `1x8c` `EP=16` LWS Decode + Correctness Gate** | **PASS (`20/20` Greedy Gate)** | **Path A (`llm-d v1.0.0` + GAIE `v1.6.2` `InferencePool` + `EndpointPicker` + `llm-d-router-disagg-sidecar:v1.0.0` `nixlv2` -> `TPURaidenConnector` Stage-3):** Pool A `2 x 4-chip` `DP=8, EP=8` Prefill (`llmd-prefill-poola-h{0,1}`) + Pool B `1 x 8-chip` `LeaderWorkerSet` `DP=16, EP=16` Decode (`llmd-decode-ep16`, **`29.28 GiB` weights/core, `51.25 GiB` KV HBM/core = `99.90M` FP8 KV tokens across 8 chips**). **Step 2e Correctness Gate PASS:** `16/16` QA sanity + **`20/20` (`100%`) bit-exact 64-token greedy parity** vs single local server, `DSpark tau = 5.16` (structured) / `2.41` (open-ended), active EPP routing across `h0` & `h1`. | Run Step 3 `R1a` (`S1 = 2048:1024`, `EP=16` Decode, `n = 32..1024`, `300 s`/level). |
 | `2026-11-07T02:19Z` | **STEP 3 `R1a`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`1x8c` `EP=16` Pool B)** | **COMPLETE (Peak `40,907.05` out tok/s @ `c=1024`)** | Completed full ladder `c = 32, 64, 128, 256, 384, 512, 768, 1024` (`300.0 s` window/level, `0.00%` cache hit). Peak **`40,907.05` out tok/s** (**`5,113.38`/dec-chip**, **`2,556.69`/tot-chip**) at `c=1024` (and **`37,549.04` out tok/s = `4,693.63`/dec-chip** at `1.319 s` P50 TTFT @ `c=768`), `DSpark tau = 3.87..4.19`, `0` preemptions, **`0 / 48,345` failures**. Completed full concurrency ladder `32..1024` (`max_num_seqs=48` x `16` DP ranks = `768` decode slot cap pinned at `99.5%` fill at `c=1024`, queuing excess `256` requests into `6.20 s` P50 TTFT). | Proceed to Step 3 `R1b` (`2 x 4c` `EP=8` Decode on Pool B). |
+| `2026-11-07T03:11Z` | **STEP 3 `R1b`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`2x4c` `EP=8` Pool B)** | **IN PROGRESS (`c=32` done)** | Completed `c = 32`; latest `c=32` = **`4,149.10` out tok/s** (`518.64`/dec-chip, `tau=3.8499`, `P90_low=116.05` tok/s, `0` err). Continuing ladder... | Continue `R1b` concurrency escalation (`32..1024`). |
 
 
 ---
@@ -56,3 +57,17 @@
 - **Peak Raw Throughput (`c=1024`):** **`40,907.05` out tok/s** (**`5,113.38` out tok/s/decode-chip**, **`2,556.69` out tok/s/total-chip**, `125,230.04` total `in+out` tok/s), `DSpark tau = 4.1595`, per-user `Med / P90_low = 54.43 / 48.55` tok/s, `TTFT P50 / P95 = 6.196 / 10.480` s, `0` preemptions, `0` failures.
 - **Zero-Queue Full-Bucket Sweet Spot (`c=768`):** **`37,549.04` out tok/s** (**`4,693.63` out tok/s/decode-chip**, **`2,346.81` out tok/s/total-chip**), `Med / P90_low = 54.21 / 44.99` tok/s, **`TTFT P50 / P95 = 1.319 / 3.809` s**, `DSpark tau = 4.1850` (`4.2141` in `60-290s`), `0` preemptions, `0` failures.
 <!-- R1A_RESULTS_END -->
+
+<!-- R1B_RESULTS_START -->
+---
+
+## Step 3 (`R1b`) Results — `S1 = 2048 : 1024` (`P` = Pool A `2 x 4c` `EP=8`, `D` = Pool B `2 x 4c` `EP=8`)
+
+- **Topology:** `llm-d` `v1.0.0` (`InferencePool/pd-disaggregation` + `EndpointPicker` + standalone Envoy router) -> Pool A `2 x 4-chip` `DP=8, EP=8` Prefill (`llmd-prefill-poola-h{0,1}`) + Pool B `2 x 4-chip` independent single-host `DP=8, EP=8` Decode (`llmd-decode-poolb-h0` on `059c` + `llmd-decode-poolb-h1` on `cz6l`, `2` instances x `8` DP ranks = `16` total DP ranks).
+- **Caps & Speculative Decoding:** `max_num_seqs=48`, `max_num_batched_tokens=288` per DP rank (`48 x 16 = 768` global decode slots; `compile_sizes=[16, 40, 48, 64, 96, 192, 288]`), `DSpark K=5` (`[(0,), (0, 0), (0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0, 0)]`).
+- **Workload (`S1`):** Calibrated exact `ISL = 2,048` tokens (`word_count = 2048` random single-token words per request, `0.00%` realized prefix cache hit, `/reset_prefix_cache` on all `4` vLLM servers before every level), forced `OSL = 1,024` tokens (`min_tokens=1024, max_tokens=1024, ignore_eos=True, temperature=0.6`), `300.0 s` closed-loop steady window + clean drain per level.
+
+| Level | Window | Steady Out tok/s (Gain) | Out tok/s / Dec Chip (`/8`) | Out tok/s / Tot Chip (`/16`) | Server Gen tok/s (`60-290s`) | Total (`in+out`) tok/s | Per-User tok/s `Med / P90_low / P95_low` (In-Win \| All) | TTFT `P50 / P95 / P99` (s) All-Reqs | TTFT `P50 / P95 / P99` (s) In-Window | TPOT `P50 / P95 / P99` (ms) All-Reqs | `DSpark` $\tau$ | Decode Batch / DP Rank (`mean / med / max`) | KV Usage % `Steady / Peak-Rank` | Pod Split (`P h0/h1` · `D b0/b1`) | Preempt (`P / D`) | Failures |
+|---|---:|---:|---:|---:|---:|---:|---|---|---|---|---|---:|---|---|---|---:|---:|
+| **`c=32`** | `300 s` | **`4,149.10`** *(base)* | **`518.64`** | **`259.32`** | `4,307.8` | `12,559.55` | `141.92 / 116.69 / 100.21` \| `141.86 / 116.05 / 98.99` | `0.345 / 0.547 / 4.155` | `0.345 / 0.549 / 4.155` | `7.05 / 10.10 / 13.18` | **`3.8499`** | `1.93 / 2.0 / 3.0` (`30.9` tot) | `D`: `0.422% / 1.194%` · `P`: `0.002% / 0.118%` | `P`:`45.7/54.3%` · `D`:`49.2/50.8%` | `0 / 0` | **`0 / 1233`** |
+<!-- R1B_RESULTS_END -->

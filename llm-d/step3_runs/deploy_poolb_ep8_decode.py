@@ -695,8 +695,12 @@ def orchestrate_deploy(args: argparse.Namespace) -> int:
             ["kubectl", "get", "pods", "-n", "default", "-o", "json"],
             capture_output=True,
             text=True,
-            check=True,
+            check=False,
         )
+        if p.returncode != 0:
+            print(f"[+{int(time.time()-t0):4d}s] WARN: transient kubectl get pods rc={p.returncode}: {p.stderr.strip()[:200]}", flush=True)
+            time.sleep(5)
+            continue
         items = {it["metadata"]["name"]: it for it in json.loads(p.stdout).get("items", [])}
         ready_pods = []
         for pod_name in target_pods:

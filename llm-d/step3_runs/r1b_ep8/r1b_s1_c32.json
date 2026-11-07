@@ -1,0 +1,298 @@
+{
+  "run_name": "r1b",
+  "shape_name": "s1",
+  "ep_per_decode_instance": 8,
+  "concurrency": 32,
+  "timestamp_utc": "2026-11-07T03:11:47.224710+00:00",
+  "workload": {
+    "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "target_isl": 2048,
+    "calibrated_word_count": 2048,
+    "target_osl": 1024,
+    "ignore_eos": true,
+    "temperature": 0.6,
+    "target_cache_hit_pct": 0.0,
+    "realized_cache_hit_pct": 0.0,
+    "mean_prompt_tokens": 2048.0,
+    "mean_completion_tokens": 1024.0
+  },
+  "window": {
+    "steady_window_s": 300.0,
+    "drain_wall_s": 307.758,
+    "total_requests_launched": 1233,
+    "ok_requests": 1233,
+    "in_window_completed_requests": 1201,
+    "straddling_requests": 32,
+    "failed_requests": 0,
+    "errors_sample": []
+  },
+  "throughput": {
+    "steady_out_tok_s": 4149.1,
+    "out_tok_s_per_decode_chip": 518.64,
+    "out_tok_s_per_total_chip": 259.32,
+    "decode_chips": 8,
+    "total_chips": 16,
+    "steady_in_tok_s": 8410.45,
+    "steady_total_tok_s": 12559.55,
+    "server_gen_tok_s_60_290": 4307.76,
+    "drain_wall_out_tok_s": 4102.55,
+    "gain_vs_prev_pct": null
+  },
+  "per_user_decode_tps": {
+    "all_requests": {
+      "count": 1233,
+      "mean": 141.5523,
+      "median": 141.8563,
+      "p90_low": 116.0523,
+      "p95_low": 98.9885,
+      "p90_hi": 168.6798
+    },
+    "in_window": {
+      "count": 1201,
+      "mean": 141.8376,
+      "median": 141.9189,
+      "p90_low": 116.6894,
+      "p95_low": 100.2121,
+      "p90_hi": 169.2514
+    }
+  },
+  "ttft_s": {
+    "all_requests": {
+      "count": 1233,
+      "mean": 0.4551,
+      "p50": 0.3451,
+      "p90": 0.4798,
+      "p95": 0.5466,
+      "p99": 4.1549
+    },
+    "in_window": {
+      "count": 1201,
+      "mean": 0.4577,
+      "p50": 0.345,
+      "p90": 0.4837,
+      "p95": 0.5493,
+      "p99": 4.1551
+    }
+  },
+  "tpot_ms": {
+    "all_requests": {
+      "count": 1233,
+      "mean": 7.2776,
+      "p50": 7.0494,
+      "p90": 8.6168,
+      "p95": 10.1022,
+      "p99": 13.1777
+    },
+    "in_window": {
+      "count": 1201,
+      "mean": 7.2588,
+      "p50": 7.0463,
+      "p90": 8.5698,
+      "p95": 9.9788,
+      "p99": 13.2414
+    }
+  },
+  "e2e_s": {
+    "all_requests": {
+      "count": 1233,
+      "mean": 7.9001,
+      "p50": 7.587,
+      "p90": 9.4356,
+      "p95": 11.3129,
+      "p99": 15.3756
+    },
+    "in_window": {
+      "count": 1201,
+      "mean": 7.8834,
+      "p50": 7.5836,
+      "p90": 9.291,
+      "p95": 11.244,
+      "p99": 15.3776
+    }
+  },
+  "dspark": {
+    "mean_accept_len_tau": 3.8499,
+    "steady_60_290_tau": 3.875,
+    "num_drafts": 328691.0,
+    "num_draft_tokens": 1643455.0,
+    "num_accepted": 936739.0,
+    "per_pos_accept_rates": {
+      "0": 0.6369,
+      "1": 0.5863,
+      "2": 0.5623,
+      "3": 0.54,
+      "4": 0.5244
+    }
+  },
+  "decode_batch_30_295": {
+    "per_dp_rank_mean": 1.93,
+    "per_dp_rank_median": 2.0,
+    "per_dp_rank_max": 3.0,
+    "total_running_mean": 30.88,
+    "total_running_median": 31.0,
+    "total_running_max": 32.0,
+    "prefill_running_mean": 0.0,
+    "prefill_running_max": 0.0,
+    "by_engine": {
+      "d0:0": {
+        "mean": 1.98,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d0:1": {
+        "mean": 1.84,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d0:2": {
+        "mean": 1.94,
+        "median": 2.0,
+        "max": 2.0
+      },
+      "d0:3": {
+        "mean": 1.98,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d0:4": {
+        "mean": 1.84,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d0:5": {
+        "mean": 1.84,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d0:6": {
+        "mean": 2.04,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d0:7": {
+        "mean": 1.92,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:0": {
+        "mean": 1.96,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:1": {
+        "mean": 1.96,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:2": {
+        "mean": 1.88,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:3": {
+        "mean": 2.06,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:4": {
+        "mean": 1.94,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:5": {
+        "mean": 1.94,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:6": {
+        "mean": 1.86,
+        "median": 2.0,
+        "max": 3.0
+      },
+      "d1:7": {
+        "mean": 1.92,
+        "median": 2.0,
+        "max": 3.0
+      }
+    }
+  },
+  "kv_cache_usage_pct": {
+    "decode_steady_mean_pct": 0.4217,
+    "decode_peak_single_rank_pct": 1.1939,
+    "prefill_steady_mean_pct": 0.0024,
+    "prefill_peak_single_rank_pct": 0.1178
+  },
+  "preemptions": {
+    "prefill": 0.0,
+    "decode": 0.0,
+    "counter_reset_or_unhealthy": false
+  },
+  "routing_distribution": {
+    "prefill_pods": {
+      "h0": {
+        "requests_delta": 563.0,
+        "prompt_tokens_delta": 1152461.0,
+        "requests_share_pct": 45.66
+      },
+      "h1": {
+        "requests_delta": 670.0,
+        "prompt_tokens_delta": 1371490.0,
+        "requests_share_pct": 54.34
+      }
+    },
+    "decode_instances": {
+      "d0": {
+        "requests_delta": 607.0,
+        "generation_tokens_delta": 621568.0,
+        "requests_share_pct": 49.23
+      },
+      "d1": {
+        "requests_delta": 626.0,
+        "generation_tokens_delta": 641024.0,
+        "requests_share_pct": 50.77
+      }
+    },
+    "decode_requests_by_engine": {
+      "d0:0": 75.0,
+      "d0:1": 72.0,
+      "d0:2": 75.0,
+      "d0:3": 79.0,
+      "d0:4": 73.0,
+      "d0:5": 79.0,
+      "d0:6": 80.0,
+      "d0:7": 74.0,
+      "d1:0": 78.0,
+      "d1:1": 77.0,
+      "d1:2": 75.0,
+      "d1:3": 81.0,
+      "d1:4": 77.0,
+      "d1:5": 78.0,
+      "d1:6": 78.0,
+      "d1:7": 82.0
+    },
+    "decode_gen_tokens_by_engine": {
+      "d0:0": 76800.0,
+      "d0:1": 73728.0,
+      "d0:2": 76800.0,
+      "d0:3": 80896.0,
+      "d0:4": 74752.0,
+      "d0:5": 80896.0,
+      "d0:6": 81920.0,
+      "d0:7": 75776.0,
+      "d1:0": 79872.0,
+      "d1:1": 78848.0,
+      "d1:2": 76800.0,
+      "d1:3": 82944.0,
+      "d1:4": 78848.0,
+      "d1:5": 79872.0,
+      "d1:6": 79872.0,
+      "d1:7": 83968.0
+    },
+    "epp_disagg_decisions_delta": 1233.0
+  },
+  "stop_evaluation": {
+    "should_stop": false,
+    "min_concurrency_for_gain_stop": 1024,
+    "reasons": []
+  }
+}

@@ -677,6 +677,7 @@ async def run_concurrency_level(
     raw_out_dir: Path,
     gcs_mirror_dir: Path | None,
     prev_steady_out_tok_s: float | None,
+    min_concurrency_for_gain_stop: int = 64,
 ) -> dict[str, Any]:
     level_tag = f"{run_name}_{shape_name}_c{concurrency}"
     print("\n" + "=" * 108, flush=True)
@@ -713,6 +714,8 @@ async def run_concurrency_level(
     p_m0 = snap_m0["prefill"]
     d_m0 = snap_m0["decode"]
 
+    out_dir.mkdir(parents=True, exist_ok=True)
+    raw_out_dir.mkdir(parents=True, exist_ok=True)
     ts_path = out_dir / f"{level_tag}_timeseries.jsonl"
     if ts_path.exists():
         ts_path.unlink()
@@ -1032,27 +1035,31 @@ async def run_concurrency_level(
 
     # Per-Decode-instance & per-DP-engine request/token distribution
     decode_inst_dist: dict[str, Any] = {}
+    tot_d_inst_reqs = 0.0
     for dk, d1_stat in snap_m1["decode_per_instance"].items():
         d0_stat = snap_m0["decode_per_instance"].get(dk, {})
         if "error" not in d1_stat and "error" not in d0_stat:
+            r_delta = max(
+                0.0,
+                d1_stat.get("request_success_total", 0.0)
+                - d0_stat.get("request_success_total", 0.0),
+            )
+            tok_delta = max(
+                0.0,
+                d1_stat.get("generation_tokens_total", 0.0)
+                - d0_stat.get("generation_tokens_total", 0.0),
+            )
+            tot_d_inst_reqs += r_delta
             decode_inst_dist[dk] = {
-                "requests_delta": round(
-                    max(
-                        0.0,
-                        d1_stat.get("request_success_total", 0.0)
-                        - d0_stat.get("request_success_total", 0.0),
-                    ),
-                    1,
-                ),
-                "generation_tokens_delta": round(
-                    max(
-                        0.0,
-                        d1_stat.get("generation_tokens_total", 0.0)
-                        - d0_stat.get("generation_tokens_total", 0.0),
-                    ),
-                    1,
-                ),
+                "requests_delta": round(r_delta, 1),
+                "generation_tokens_delta": round(tok_delta, 1),
             }
+    for dk in decode_inst_dist:
+        decode_inst_dist[dk]["requests_share_pct"] = (
+            round(100.0 * decode_inst_dist[dk]["requests_delta"] / tot_d_inst_reqs, 2)
+            if tot_d_inst_reqs > 0
+            else 0.0
+        )
 
     decode_reqs_by_eng = {
         k: round(
@@ -1098,7 +1105,7 @@ async def run_concurrency_level(
 
     stop_reasons: list[str] = []
     if (
-        concurrency >= 64
+        concurrency >= min_concurrency_for_gain_stop
         and gain_vs_prev_pct is not None
         and gain_vs_prev_pct < 5.0
     ):
@@ -1261,6 +1268,7 @@ async def run_concurrency_level(
         },
         "stop_evaluation": {
             "should_stop": bool(len(stop_reasons) > 0),
+            "min_concurrency_for_gain_stop": min_concurrency_for_gain_stop,
             "reasons": stop_reasons,
         },
     }
@@ -1316,6 +1324,7 @@ async def run_concurrency_level(
         flush=True,
     )
     print(f"  Prefill Pod Split: {prefill_pod_dist}", flush=True)
+    print(f"  Decode Instance Split: {decode_inst_dist}", flush=True)
     if stop_reasons:
         print(f"  [STOP RULE TRIGGERED] {stop_reasons}", flush=True)
     print("=" * 108, flush=True)
@@ -1406,6 +1415,7 @@ async def main_async(args: argparse.Namespace) -> int:
                 raw_out_dir=raw_out_dir,
                 gcs_mirror_dir=gcs_mirror_dir,
                 prev_steady_out_tok_s=prev_out,
+                min_concurrency_for_gain_stop=args.min_concurrency_for_gain_stop,
             )
             all_level_summaries.append(lvl_summary)
             prev_out = lvl_summary["throughput"]["steady_out_tok_s"]
@@ -1418,6 +1428,7 @@ async def main_async(args: argparse.Namespace) -> int:
                         "shape_name": args.shape_name,
                         "ep_per_decode_instance": args.ep_size,
                         "calibrated_word_count": word_count,
+                        "min_concurrency_for_gain_stop": args.min_concurrency_for_gain_stop,
                         "completed_concurrencies": [
                             s["concurrency"] for s in all_level_summaries
                         ],
@@ -1446,10 +1457,13 @@ async def main_async(args: argparse.Namespace) -> int:
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="llm-d Step 3 Shape Sweep Benchmark Harness")
     ap.add_argument("--run-name", default="r1a")
-    ap.add_argument("--shape-name", default="s1")
+    ap.add_argument("--shape-name", "--shape", dest="shape_name", default="s1")
     ap.add_argument("--ep-size", type=int, default=16)
     ap.add_argument(
-        "--router-url", default="http://pd-disaggregation-epp.default.svc.cluster.local:80"
+        "--router-url",
+        "--epp-url",
+        dest="router_url",
+        default="http://pd-disaggregation-epp.default.svc.cluster.local:80",
     )
     ap.add_argument("--model", default="deepseek-ai/DeepSeek-V4.1-Flash")
     ap.add_argument("--target-isl", type=int, default=2048)
@@ -1462,6 +1476,12 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--num-trunks", type=int, default=32)
     ap.add_argument(
         "--concurrencies", default="32,64,128,256,384,512,768,1024"
+    )
+    ap.add_argument(
+        "--min-concurrency-for-gain-stop",
+        type=int,
+        default=64,
+        help="Minimum concurrency at which Rule 1 (gain_vs_prev_pct < 5.0%%) can trigger an early stop",
     )
     ap.add_argument("--steady-seconds", type=float, default=300.0)
     ap.add_argument("--warmup-concurrency", type=int, default=16)
@@ -1479,7 +1499,7 @@ def parse_args() -> argparse.Namespace:
     )
     ap.add_argument("--run-seed", type=int, default=101)
     ap.add_argument("--prev-steady-out-tok-s", type=float, default=0.0)
-    ap.add_argument("--out-dir", default="/dev/shm/step3_runs/r1a_ep16")
+    ap.add_argument("--out-dir", "--output-dir", dest="out_dir", default="/dev/shm/step3_runs/r1a_ep16")
     ap.add_argument("--raw-out-dir", default="/dev/shm/step3_runs/r1a_ep16_raw")
     ap.add_argument(
         "--gcs-mirror-dir",
