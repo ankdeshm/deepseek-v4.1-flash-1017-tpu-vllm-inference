@@ -7,7 +7,8 @@
   "completed_concurrencies": [
     32,
     64,
-    128
+    128,
+    256
   ],
   "stopped_early": false,
   "stop_reasons": [],
@@ -899,6 +900,304 @@
           "d1:7": 263168.0
         },
         "epp_disagg_decisions_delta": 4148.0
+      },
+      "stop_evaluation": {
+        "should_stop": false,
+        "min_concurrency_for_gain_stop": 1024,
+        "reasons": []
+      }
+    },
+    {
+      "run_name": "r2",
+      "shape_name": "s2",
+      "ep_per_decode_instance": 8,
+      "concurrency": 256,
+      "timestamp_utc": "2026-11-07T04:21:13.391898+00:00",
+      "workload": {
+        "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+        "target_isl": 1024,
+        "calibrated_word_count": 1024,
+        "target_osl": 1024,
+        "ignore_eos": true,
+        "temperature": 0.6,
+        "target_cache_hit_pct": 0.0,
+        "realized_cache_hit_pct": 0.0,
+        "mean_prompt_tokens": 1024.0,
+        "mean_completion_tokens": 1024.0
+      },
+      "window": {
+        "steady_window_s": 300.0,
+        "drain_wall_s": 315.092,
+        "total_requests_launched": 5265,
+        "ok_requests": 5265,
+        "in_window_completed_requests": 5009,
+        "straddling_requests": 256,
+        "failed_requests": 0,
+        "errors_sample": []
+      },
+      "throughput": {
+        "steady_out_tok_s": 17512.61,
+        "out_tok_s_per_decode_chip": 2189.08,
+        "out_tok_s_per_total_chip": 1094.54,
+        "decode_chips": 8,
+        "total_chips": 16,
+        "steady_in_tok_s": 17954.13,
+        "steady_total_tok_s": 35466.75,
+        "server_gen_tok_s_60_290": 17704.1,
+        "drain_wall_out_tok_s": 17110.41,
+        "gain_vs_prev_pct": 25.726
+      },
+      "per_user_decode_tps": {
+        "all_requests": {
+          "count": 5265,
+          "mean": 73.8652,
+          "median": 73.0106,
+          "p90_low": 61.9297,
+          "p95_low": 52.0566,
+          "p90_hi": 89.0052
+        },
+        "in_window": {
+          "count": 5009,
+          "mean": 73.41,
+          "median": 72.745,
+          "p90_low": 61.7157,
+          "p95_low": 51.9147,
+          "p90_hi": 88.1946
+        }
+      },
+      "ttft_s": {
+        "all_requests": {
+          "count": 5265,
+          "mean": 0.6074,
+          "p50": 0.5484,
+          "p90": 0.678,
+          "p95": 1.1185,
+          "p99": 1.8727
+        },
+        "in_window": {
+          "count": 5009,
+          "mean": 0.6103,
+          "p50": 0.5486,
+          "p90": 0.6799,
+          "p95": 1.1254,
+          "p99": 1.8756
+        }
+      },
+      "tpot_ms": {
+        "all_requests": {
+          "count": 5265,
+          "mean": 13.9523,
+          "p50": 13.6966,
+          "p90": 16.1474,
+          "p95": 19.2098,
+          "p99": 24.1522
+        },
+        "in_window": {
+          "count": 5009,
+          "mean": 14.0251,
+          "p50": 13.7467,
+          "p90": 16.2033,
+          "p95": 19.2624,
+          "p99": 24.2565
+        }
+      },
+      "e2e_s": {
+        "all_requests": {
+          "count": 5265,
+          "mean": 14.8806,
+          "p50": 14.6173,
+          "p90": 17.2334,
+          "p95": 20.2396,
+          "p99": 25.4468
+        },
+        "in_window": {
+          "count": 5009,
+          "mean": 14.958,
+          "p50": 14.6747,
+          "p90": 17.2413,
+          "p95": 20.3482,
+          "p99": 25.505
+        }
+      },
+      "dspark": {
+        "mean_accept_len_tau": 3.9324,
+        "steady_60_290_tau": 3.9373,
+        "num_drafts": 1374156.0,
+        "num_draft_tokens": 6870780.0,
+        "num_accepted": 4029609.0,
+        "per_pos_accept_rates": {
+          "0": 0.6609,
+          "1": 0.6064,
+          "2": 0.5775,
+          "3": 0.5523,
+          "4": 0.5352
+        }
+      },
+      "decode_batch_30_295": {
+        "per_dp_rank_mean": 15.46,
+        "per_dp_rank_median": 16.0,
+        "per_dp_rank_max": 18.0,
+        "total_running_mean": 247.43,
+        "total_running_median": 248.0,
+        "total_running_max": 255.0,
+        "prefill_running_mean": 0.0,
+        "prefill_running_max": 0.0,
+        "by_engine": {
+          "d0:0": {
+            "mean": 15.39,
+            "median": 16.0,
+            "max": 18.0
+          },
+          "d0:1": {
+            "mean": 15.33,
+            "median": 15.0,
+            "max": 17.0
+          },
+          "d0:2": {
+            "mean": 15.2,
+            "median": 15.0,
+            "max": 17.0
+          },
+          "d0:3": {
+            "mean": 15.41,
+            "median": 16.0,
+            "max": 17.0
+          },
+          "d0:4": {
+            "mean": 15.43,
+            "median": 15.0,
+            "max": 17.0
+          },
+          "d0:5": {
+            "mean": 15.45,
+            "median": 16.0,
+            "max": 17.0
+          },
+          "d0:6": {
+            "mean": 15.45,
+            "median": 16.0,
+            "max": 18.0
+          },
+          "d0:7": {
+            "mean": 15.47,
+            "median": 15.0,
+            "max": 17.0
+          },
+          "d1:0": {
+            "mean": 15.31,
+            "median": 16.0,
+            "max": 17.0
+          },
+          "d1:1": {
+            "mean": 15.61,
+            "median": 16.0,
+            "max": 18.0
+          },
+          "d1:2": {
+            "mean": 15.53,
+            "median": 16.0,
+            "max": 17.0
+          },
+          "d1:3": {
+            "mean": 15.35,
+            "median": 15.0,
+            "max": 17.0
+          },
+          "d1:4": {
+            "mean": 15.82,
+            "median": 16.0,
+            "max": 17.0
+          },
+          "d1:5": {
+            "mean": 15.71,
+            "median": 16.0,
+            "max": 17.0
+          },
+          "d1:6": {
+            "mean": 15.49,
+            "median": 15.0,
+            "max": 17.0
+          },
+          "d1:7": {
+            "mean": 15.49,
+            "median": 16.0,
+            "max": 17.0
+          }
+        }
+      },
+      "kv_cache_usage_pct": {
+        "decode_steady_mean_pct": 3.0573,
+        "decode_peak_single_rank_pct": 3.8493,
+        "prefill_steady_mean_pct": 0.0218,
+        "prefill_peak_single_rank_pct": 0.1963
+      },
+      "preemptions": {
+        "prefill": 0.0,
+        "decode": 0.0,
+        "counter_reset_or_unhealthy": false
+      },
+      "routing_distribution": {
+        "prefill_pods": {
+          "h0": {
+            "requests_delta": 2538.0,
+            "prompt_tokens_delta": 2596374.0,
+            "requests_share_pct": 48.21
+          },
+          "h1": {
+            "requests_delta": 2727.0,
+            "prompt_tokens_delta": 2789721.0,
+            "requests_share_pct": 51.79
+          }
+        },
+        "decode_instances": {
+          "d0": {
+            "requests_delta": 2681.0,
+            "generation_tokens_delta": 2745344.0,
+            "requests_share_pct": 50.92
+          },
+          "d1": {
+            "requests_delta": 2584.0,
+            "generation_tokens_delta": 2646016.0,
+            "requests_share_pct": 49.08
+          }
+        },
+        "decode_requests_by_engine": {
+          "d0:0": 331.0,
+          "d0:1": 333.0,
+          "d0:2": 342.0,
+          "d0:3": 334.0,
+          "d0:4": 333.0,
+          "d0:5": 343.0,
+          "d0:6": 334.0,
+          "d0:7": 331.0,
+          "d1:0": 326.0,
+          "d1:1": 324.0,
+          "d1:2": 325.0,
+          "d1:3": 316.0,
+          "d1:4": 321.0,
+          "d1:5": 324.0,
+          "d1:6": 320.0,
+          "d1:7": 328.0
+        },
+        "decode_gen_tokens_by_engine": {
+          "d0:0": 338944.0,
+          "d0:1": 340992.0,
+          "d0:2": 350208.0,
+          "d0:3": 342016.0,
+          "d0:4": 340992.0,
+          "d0:5": 351232.0,
+          "d0:6": 342016.0,
+          "d0:7": 338944.0,
+          "d1:0": 333824.0,
+          "d1:1": 331776.0,
+          "d1:2": 332800.0,
+          "d1:3": 323584.0,
+          "d1:4": 328704.0,
+          "d1:5": 331776.0,
+          "d1:6": 327680.0,
+          "d1:7": 335872.0
+        },
+        "epp_disagg_decisions_delta": 5265.0
       },
       "stop_evaluation": {
         "should_stop": false,
