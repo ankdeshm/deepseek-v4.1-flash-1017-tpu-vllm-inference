@@ -5,8 +5,9 @@
 - **Engine Image:** `docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6` (`vllm-torchtpu` `ebe4298eb`, `vllm` `77a1dc7f9`, `libtpu==0.0.48`, `PYTHONHASHSEED=0`)
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
+- **Final Report:** [`FINAL_REPORT.md`](FINAL_REPORT.md) (also `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/FINAL_REPORT.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T09:44:33Z`
+- **Last Updated (UTC):** `2026-11-07T09:49:02Z`
 
 ---
 
@@ -24,6 +25,7 @@
 | `2026-11-07T08:29Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **COMPLETE (4 conditions)** | `roundrobin` (n=64,128,256): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=64,128,256): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | `R6` running, then `R5`. |
 | `2026-11-07T08:32Z` | **STEP 3 `R6`: Agentic Continuity (`~95%` hit, `2P2D`, prefix-aware + balanced DP pin)** | **COMPLETE** | n=128: hit `95.32%`, out `8,529.90` tok/s, TTFT P50/P95 `0.965/1.452` s; n=256: hit `95.31%`, out `10,753.45` tok/s (`1,344.18`/dec-chip), TTFT P50/P95 `1.154/1.597` s; `0` failures | `R5` (`1P3D`) deploying. |
 | `2026-11-07T09:44Z` | **STEP 3 `R5`: Ratio Check `1P3D` (`S1`)** | **COMPLETE** | Peak `51,134.93` out tok/s @ `c=1024` (`4,261.24`/dec-chip `/12`, `3,195.93`/tot-chip) | FINAL REPORT. |
+| `2026-11-07T09:48Z` | **FINAL REPORT** | **PUBLISHED** | All spec'd runs complete (`R0`, Step 2 gate, `R1a`, `R1b`, `R2`, `R3`, `R4` x4 conditions, `R5`, `R6`) with `0` failed requests across every level. Headline: `2 x 4c EP=8` decode beats `1 x 8c EP=16` at all levels; best `S1` `5,852.87` out tok/s per decode chip (`R1b`, `c=1024`); `1P3D` peak `51,134.93` out tok/s (`3,195.93` per total chip). | — |
 
 
 ---
