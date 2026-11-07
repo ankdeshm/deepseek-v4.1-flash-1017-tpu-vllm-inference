@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.tar
+*.tar.gz
+step1_r0/pd_*.log
+step1_r0/pass1/pd_*.log
+step1_r0/pass1/*_requests_*.json
+step1_r0/*_requests_*.json
+step3_runs/**/pd_*.log
+step3_runs/**/*_requests_*.json

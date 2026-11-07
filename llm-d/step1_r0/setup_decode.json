@@ -1,0 +1,44 @@
+{
+  "host": "gke-tpu-51ea19d7-xq6s",
+  "ip": "192.168.100.38",
+  "ckpt": {
+    "setup_wall_s": 42.79,
+    "ckpt_bytes": 510310755720,
+    "ckpt_gcs_to_shm_s": 0.0,
+    "ckpt_gcs_gb_per_s": 0.0,
+    "pd_env": {
+      "PYTHONHASHSEED": "0",
+      "ADVERTISE_HOST": "192.168.100.38",
+      "RUN_ID": "step1_r0_20261106",
+      "PORT": "9400",
+      "CED_PREFILL": "0",
+      "ENABLE_PREFIX_CACHING": "0",
+      "PREFIX_CACHE_RETENTION_INTERVAL": "0",
+      "MAX_NUM_SEQS": "48",
+      "MAX_NUM_BATCHED_TOKENS": "288",
+      "COMPILE_SIZES": "[16, 40, 48, 64, 96, 192, 288]",
+      "ENABLE_DSPARK": "1",
+      "DSPARK_TOKENS": "5",
+      "ASYNC_SCHEDULING": "1",
+      "GPU_MEMORY_UTILIZATION": "0.85",
+      "TPU_RAIDEN_TRANSFER_PARALLELISM": "1"
+    }
+  },
+  "warm_cache": {
+    "tar_obj": "dsv41-v7x-llmd-20261106/compile_cache/compile_cache_decode_dp8.tar.gz",
+    "tar_size_mb": 4179.36,
+    "download_s": 22.94,
+    "extract_s": 74.23,
+    "tar_returncode": 2,
+    "dropped_trailing_partial_file": "/dev/shm/pd_cache_decode/vllm/torch_compile_cache/torch_aot_compile/5928c074a8ccf4554491e0c4a5a99d026d18307ed1b47ca6da7f5443e6aca520/inductor_cache/aotautograd/torchtpu_25e0fbc38c08800e6470cb6dfae579963bd7a508bb93a895fb5383082c0100c0/n366vpv4kfhrpjm5jejjsmw5kypqlalfyf3nrdzfb6bun5t7idj",
+    "top_entries": [
+      "vllm/",
+      "vllm/torch_compile_cache/",
+      "vllm/torch_compile_cache/b18868078e/",
+      "vllm/torch_compile_cache/b18868078e/rank_0_6/",
+      "vllm/torch_compile_cache/b18868078e/rank_0_6/model/"
+    ],
+    "vllm_files": 1235,
+    "xla_files": 0
+  }
+}

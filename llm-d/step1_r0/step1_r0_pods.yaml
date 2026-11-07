@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: r0-prefill-poola-h0
+  namespace: default
+  labels:
+    app: dsv41-step1-r0
+    role: prefill
+  annotations:
+    gke-gcsfuse/volumes: "true"
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+spec:
+  serviceAccountName: default
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  restartPolicy: Never
+  nodeSelector:
+    cloud.google.com/gke-nodepool: ank-tpu-v7x-8-pool-a
+    cloud.google.com/gke-tpu-accelerator: tpu7x
+    cloud.google.com/gke-tpu-topology: 2x2x2
+    kubernetes.io/hostname: gke-tpu-51ea19d7-rqkr
+  tolerations:
+  - key: "google.com/tpu"
+    operator: "Exists"
+    effect: "NoSchedule"
+  - key: "cloud.google.com/gke-queued"
+    operator: "Exists"
+    effect: "NoSchedule"
+  containers:
+  - name: runner
+    image: docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      privileged: true
+    command:
+    - bash
+    - -lc
+    - |
+      for i in $(seq 1 30); do
+        [ -f /models/dsv41-v7x-llmd-20261106/step1_r0/step1_r0_driver.py ] && break
+        sleep 1
+      done
+      exec python3 -u /models/dsv41-v7x-llmd-20261106/step1_r0/step1_r0_driver.py --pod-role=prefill
+    env:
+    - name: PJRT_DEVICE
+      value: "TPU"
+    - name: PYTHONHASHSEED
+      value: "0"
+    resources:
+      requests:
+        google.com/tpu: "4"
+      limits:
+        google.com/tpu: "4"
+    volumeMounts:
+    - name: dshm
+      mountPath: /dev/shm
+    - name: models-gcs
+      mountPath: /models
+  volumes:
+  - name: dshm
+    hostPath:
+      path: /dev/shm
+      type: Directory
+  - name: models-gcs
+    persistentVolumeClaim:
+      claimName: ank-usc1-models-pvc
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: r0-decode-poola-h1
+  namespace: default
+  labels:
+    app: dsv41-step1-r0
+    role: decode
+  annotations:
+    gke-gcsfuse/volumes: "true"
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+spec:
+  serviceAccountName: default
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  restartPolicy: Never
+  nodeSelector:
+    cloud.google.com/gke-nodepool: ank-tpu-v7x-8-pool-a
+    cloud.google.com/gke-tpu-accelerator: tpu7x
+    cloud.google.com/gke-tpu-topology: 2x2x2
+    kubernetes.io/hostname: gke-tpu-51ea19d7-xq6s
+  tolerations:
+  - key: "google.com/tpu"
+    operator: "Exists"
+    effect: "NoSchedule"
+  - key: "cloud.google.com/gke-queued"
+    operator: "Exists"
+    effect: "NoSchedule"
+  containers:
+  - name: runner
+    image: docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      privileged: true
+    command:
+    - bash
+    - -lc
+    - |
+      for i in $(seq 1 30); do
+        [ -f /models/dsv41-v7x-llmd-20261106/step1_r0/step1_r0_driver.py ] && break
+        sleep 1
+      done
+      exec python3 -u /models/dsv41-v7x-llmd-20261106/step1_r0/step1_r0_driver.py --pod-role=decode
+    env:
+    - name: PJRT_DEVICE
+      value: "TPU"
+    - name: PYTHONHASHSEED
+      value: "0"
+    resources:
+      requests:
+        google.com/tpu: "4"
+      limits:
+        google.com/tpu: "4"
+    volumeMounts:
+    - name: dshm
+      mountPath: /dev/shm
+    - name: models-gcs
+      mountPath: /models
+  volumes:
+  - name: dshm
+    hostPath:
+      path: /dev/shm
+      type: Directory
+  - name: models-gcs
+    persistentVolumeClaim:
+      claimName: ank-usc1-models-pvc

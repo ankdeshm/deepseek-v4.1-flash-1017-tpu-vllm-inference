@@ -1,0 +1,160 @@
+{
+  "window_output_tok_per_s": 7030.586582282187,
+  "per_decode_chip_tok_per_s": 1757.6466455705468,
+  "per_total_chip_tok_per_s": 878.8233227852734,
+  "window_total_in_plus_out_tok_per_s": 269712.65324894886,
+  "pass_gate_range": [
+    6700.0,
+    8200.0
+  ],
+  "pass_gate_ok": true,
+  "dspark_spec_decode_steady": {
+    "num_drafts": 739235.0,
+    "num_draft_tokens": 3696175.0,
+    "num_accepted": 1418711.0,
+    "mean_accept_len_tau": 2.9192,
+    "per_pos_accept_rates": [
+      0.5763,
+      0.4352,
+      0.3513,
+      0.2966,
+      0.2597
+    ]
+  },
+  "dspark_tau_ok": true,
+  "prefill_kv_cache_usage_pct": {
+    "steady_mean_pct": 0.735,
+    "peak_mean_across_ranks_pct": 7.059,
+    "peak_single_rank_pct": 7.147
+  },
+  "decode_kv_cache_usage_pct": {
+    "steady_mean_pct": 8.28,
+    "peak_mean_across_ranks_pct": 9.976,
+    "peak_single_rank_pct": 13.853
+  },
+  "preemptions_delta": {
+    "prefill": 0.0,
+    "decode": 0.0
+  },
+  "steady_running_batch_size": {
+    "prefill_total_mean": 0.0,
+    "prefill_total_max": 8.0,
+    "decode_total_mean": 107.18,
+    "decode_total_max": 128.0,
+    "decode_per_dp_rank": {
+      "0": {
+        "mean": 13.08,
+        "median": 14.0,
+        "max": 16.0
+      },
+      "1": {
+        "mean": 13.51,
+        "median": 14.0,
+        "max": 16.0
+      },
+      "2": {
+        "mean": 13.52,
+        "median": 14.0,
+        "max": 16.0
+      },
+      "3": {
+        "mean": 13.52,
+        "median": 14.0,
+        "max": 16.0
+      },
+      "4": {
+        "mean": 13.38,
+        "median": 13.0,
+        "max": 16.0
+      },
+      "5": {
+        "mean": 13.36,
+        "median": 14.0,
+        "max": 16.0
+      },
+      "6": {
+        "mean": 13.34,
+        "median": 14.0,
+        "max": 16.0
+      },
+      "7": {
+        "mean": 13.46,
+        "median": 14.0,
+        "max": 16.0
+      }
+    }
+  },
+  "per_dp_rank_completed_requests_including_warmup": {
+    "prefill_by_engine": {
+      "0": 567.0,
+      "1": 576.0,
+      "2": 554.0,
+      "3": 601.0,
+      "4": 572.0,
+      "5": 587.0,
+      "6": 580.0,
+      "7": 584.0
+    },
+    "decode_by_engine": {
+      "0": 592.0,
+      "1": 550.0,
+      "2": 559.0,
+      "3": 608.0,
+      "4": 568.0,
+      "5": 562.0,
+      "6": 595.0,
+      "7": 587.0
+    },
+    "decode_generation_tokens_by_engine": {
+      "0": 276280.0,
+      "1": 277440.0,
+      "2": 269093.0,
+      "3": 270035.0,
+      "4": 268512.0,
+      "5": 270609.0,
+      "6": 267379.0,
+      "7": 261546.0
+    }
+  },
+  "request_latency_and_stream_analysis": {
+    "total_requests": 4413,
+    "ok_requests": 4413,
+    "in_window_completed_requests": 4285,
+    "client_dispatched_per_prefill_dp_rank": {
+      "0": 541,
+      "1": 550,
+      "2": 528,
+      "3": 575,
+      "4": 546,
+      "5": 561,
+      "6": 554,
+      "7": 558
+    },
+    "ttft_all_requests_s": {
+      "p50": 1.2068,
+      "p90": 1.5168,
+      "p95": 1.7176,
+      "p99": 16.838,
+      "mean": 1.6007
+    },
+    "ttft_in_window_s": {
+      "p50": 1.2059,
+      "p90": 1.5182,
+      "p95": 1.741,
+      "p99": 16.8417,
+      "mean": 1.6123
+    },
+    "per_user_decode_tps_all_requests": {
+      "median": 65.964,
+      "p90_low": 48.106,
+      "p95_low": 42.06,
+      "p90_hi": 79.725
+    },
+    "per_user_decode_tps_in_window": {
+      "median": 66.17,
+      "p90_low": 48.914,
+      "p95_low": 43.164,
+      "p90_hi": 79.739
+    }
+  }
+}
