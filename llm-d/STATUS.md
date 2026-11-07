@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T08:51:47Z`
+- **Last Updated (UTC):** `2026-11-07T09:06:54Z`
 
 ---
 
@@ -23,7 +23,7 @@
 | `2026-11-07T05:52Z` | **STEP 3 `R3`: Decode-Only Ceiling (`S1` `~99.5%` Cached, `2P2D` `EP=8`)** | **COMPLETE (Ceiling `44,100.66` out tok/s @ `c=1024`)** | Swept `c = 256, 384, 512, 768, 1024` (`~99.5%` prefix hit, Prefill `<5%` busy). True Decode Ceiling **`44,100.66` out tok/s** (**`5,512.58`/dec-chip**, **`2,756.29`/tot-chip**) at `c=1024`, `DSpark tau = 4.14..4.15`, `0 / 47,647` failures. | Proceed to Step 4 `R4` (`Agentic Prefix-Aware Routing`). |
 | `2026-11-07T08:29Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **COMPLETE (4 conditions)** | `roundrobin` (n=64,128,256): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=64,128,256): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | `R6` running, then `R5`. |
 | `2026-11-07T08:32Z` | **STEP 3 `R6`: Agentic Continuity (`~95%` hit, `2P2D`, prefix-aware + balanced DP pin)** | **COMPLETE** | n=128: hit `95.32%`, out `8,529.90` tok/s, TTFT P50/P95 `0.965/1.452` s; n=256: hit `95.31%`, out `10,753.45` tok/s (`1,344.18`/dec-chip), TTFT P50/P95 `1.154/1.597` s; `0` failures | `R5` (`1P3D`) deploying. |
-| `2026-11-07T09:00Z` | **STEP 3 `R5`: Ratio Check `1P3D` (`S1`)** | **IN PROGRESS** | `llmd-decode-poola-h1` ready; S1 ladder running. | Complete `R5`, then FINAL REPORT. |
+| `2026-11-07T09:06Z` | **STEP 3 `R5`: Ratio Check `1P3D` (`S1`)** | **IN PROGRESS** | Peak `4,200.53` out tok/s @ `c=32` (`350.04`/dec-chip `/12`, `262.53`/tot-chip) | Continue ladder. |
 
 
 ---
@@ -196,3 +196,15 @@
 
 - **Continuity vs prior results (same model, agentic `~18K` input, `~95%` hit):** prior `2P2D n=256` = `14,542` out tok/s (`1,818` per decode chip, `~68` tok/s/user); this run `2P2D n=256` = `10,753.45` (`1,344.18` per decode chip, `43.78` tok/s/user median) = `-26.1%`. Prior `1P1D n=128` = `7,446` (`1,862` per decode chip, 4 decode chips); this run `2P2D n=128` (8 decode chips) = `8,529.90`. Realized hit matches the target (`95.3%`) and TTFT P95 stays `<1.6 s`. Likely contributor to the lower per-chip output (not isolated): the same `X-data-parallel-rank` header also pins the *decode* rank per trunk, whereas the prior `toy_proxy_server.py` balanced decode ranks by least in-flight; the `~80%` continuity point is the `R4` table.
 <!-- R6_RESULTS_END -->
+
+<!-- R5_RESULTS_START -->
+---
+
+## Step 3 (`R5`) Ratio Check — `1P3D` (`P` = Pool A `h0` `4c`, `D` = Pool A `h1` `4c` `EP=8` + Pool B `2 x 4c` `EP=8`), `S1 = 2048:1024`
+
+- Same caps per DP rank (`48 / 288`, `DSpark K=5`), `0%` prefix hit, `ignore_eos=True`, `300 s` per level. Per decode chip = `/12`, per total chip = `/16`. `R1b` (`2P2D`) shown for the same `c`.
+
+| Level | Steady Out tok/s (Gain) | /Dec Chip (`/12`) | /Tot Chip (`/16`) | Steady In tok/s | Per-User `Med / P90_low / P95_low` (All) | TTFT `P50 / P95 / P99` (s, All) | `DSpark` $\tau$ | Decode Batch / DP Rank | Prefill Running (mean) | `R1b` Out tok/s / per Dec Chip (`/8`) | Δ Out vs `R1b` | Preempt (D) | Failures |
+|---|---:|---:|---:|---:|---|---|---:|---:|---:|---|---:|---:|---:|
+| **`c=32`** | **`4,200.53`** *(base)* | **`350.04`** | **`262.53`** | `8,519.68` | `146.25 / 116.87 / 102.56` | `0.417 / 0.980 / 1.486` | `3.6995` | `1.25` | `0.00` | `4,149.10` / `518.64` | `+1.2%` | `0.0` | **`0 / 1249`** |
+<!-- R5_RESULTS_END -->
