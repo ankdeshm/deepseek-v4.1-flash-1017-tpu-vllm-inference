@@ -7,5 +7,9 @@ step1_r0/pd_*.log
 step1_r0/pass1/pd_*.log
 step1_r0/pass1/*_requests_*.json
 step1_r0/*_requests_*.json
+step2_llmd/*.log
+step2_llmd/prefill_poola/*.log
+step3_runs/**/*.log
 step3_runs/**/pd_*.log
 step3_runs/**/*_requests_*.json
+

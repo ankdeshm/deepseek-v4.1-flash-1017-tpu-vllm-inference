@@ -1,0 +1,138 @@
+{
+  "status": "SUCCESS",
+  "timestamp_utc": "2026-11-07T01:00:00Z",
+  "cluster": "ank-tpu-v7x",
+  "zone": "us-central1-c",
+  "project": "diesel-patrol-382622",
+  "llmd_infrastructure": {
+    "namespace": "default",
+    "helm_release": "pd-disaggregation",
+    "chart": "oci://ghcr.io/llm-d/charts/llm-d-router-standalone:v1.0.0",
+    "chart_digest": "sha256:c1d1af55382ef1097188070385c6de02b771f34681678e658a59e975024c",
+    "gaie_crd_version": "v1.6.2",
+    "inference_pool": "pd-disaggregation",
+    "inference_pool_selector": {
+      "llm-d.ai/guide": "pd-disaggregation"
+    },
+    "inference_pool_target_port": 8000,
+    "epp_pod": "pd-disaggregation-epp-75d7cd8795-tt4q6",
+    "epp_node": "gke-ank-tpu-v7x-default-pool-9a36450e-bo0p",
+    "epp_service_ip": "34.118.233.9",
+    "epp_router_http_url": "http://pd-disaggregation-epp.default.svc.cluster.local:80",
+    "epp_metrics_url": "http://pd-disaggregation-epp.default.svc.cluster.local:9090/metrics",
+    "epp_grpc_ext_proc_port": 9002,
+    "ready_endpoints_discovered": 3,
+    "images": {
+      "endpoint_picker": "ghcr.io/llm-d/llm-d-router-endpoint-picker:v1.0.0@sha256:024188e998f516879f68532016ca24fabca00afbdcc2af9a61b17634e197df2c",
+      "envoy_router": "docker.io/envoyproxy/envoy:distroless-v1.33.2@sha256:85500e28ed088ec39ff0adc1be3d358a8ad062926aaa62c36b28bde00919e4e8",
+      "disagg_routing_sidecar": "ghcr.io/llm-d/llm-d-router-disagg-sidecar:v1.0.0@sha256:83cdf20199485329baca89b69d78f695735855ed93412aeaeec325d2374ced04",
+      "vllm_tpu_base": "docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6"
+    }
+  },
+  "ep16_decode_deployment": {
+    "leaderworkerset": "llmd-decode-ep16",
+    "node_pool": "ank-tpu-v7x-8-pool-b",
+    "topology": "2x2x2",
+    "physical_chips": 8,
+    "tensorcores": 16,
+    "served_model_name": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "run_id": "llmd_ep16",
+    "leader": {
+      "pod": "llmd-decode-ep16-0",
+      "ready": "4/4",
+      "node": "gke-tpu-771db71a-059c",
+      "ip": "192.168.100.198",
+      "gce_agent_worker_number": 0,
+      "dp_ranks": "0..7",
+      "vllm_port": 9400,
+      "llmd_sidecar_port": 8000,
+      "llmd_sidecar_metrics_port": 9091,
+      "raiden_reshard_store_ports": "28000..28007",
+      "raiden_dispatch_ports": "28100..28107",
+      "raiden_legacy_control_ports": "9200..9214 (even)"
+    },
+    "worker": {
+      "pod": "llmd-decode-ep16-0-1",
+      "ready": "3/3",
+      "node": "gke-tpu-771db71a-cz6l",
+      "ip": "192.168.100.199",
+      "gce_agent_worker_number": 1,
+      "dp_ranks": "8..15",
+      "headless": true,
+      "raiden_reshard_store_ports": "28008..28015",
+      "raiden_dispatch_ports": "28108..28115",
+      "raiden_legacy_control_ports": "9216..9230 (even)"
+    },
+    "parallelism_and_precision": {
+      "dp_size": 16,
+      "dp_size_local": 8,
+      "tp_size": 1,
+      "ep_size": 16,
+      "target_local_experts_per_rank": 24,
+      "dspark_local_experts_per_rank": 8,
+      "speculative_decoding": "dspark (K=5)",
+      "async_scheduling": true,
+      "enable_prefix_caching": false,
+      "max_num_seqs": 48,
+      "max_num_batched_tokens": 288,
+      "compile_sizes": [16, 40, 48, 64, 96, 192, 288],
+      "attention_weights": "FP8 (float8_e4m3fn, quantization=deepseek_v4_fp8)",
+      "moe_weights_and_dispatch": "MXFP4 W4A8 (weight_format=fp4, wire_dtype=float8_e4m3fn, rhs_qb=512)",
+      "kv_cache_dtype": "FP8 (fp8_ds_mla)"
+    },
+    "memory_and_kv_cache": {
+      "gpu_memory_utilization": 0.85,
+      "total_hbm_per_core_gib": 94.74,
+      "hbm_cap_per_core_gib": 80.53,
+      "weights_and_engram_used_per_core_gib": 29.28,
+      "available_kv_hbm_per_core_gib": 51.25,
+      "post_warmup_used_hbm_per_core_gib": 61.017,
+      "post_warmup_free_hbm_per_core_gib": 33.721,
+      "kv_cache_tokens_per_rank": 6243942,
+      "kv_cache_tokens_total_16_ranks": 99903072,
+      "max_128k_concurrency_per_rank": 47.64,
+      "max_128k_concurrency_total_16_ranks": 762.24,
+      "shm_total_gib": 850.0,
+      "shm_used_post_eviction_gib": 28.13,
+      "shm_free_post_eviction_gib": 821.87
+    },
+    "boot_and_compile_timing": {
+      "cold_vllm_serve_to_ready_seconds": 1313.87,
+      "tpu_dist_16_rank_init_seconds": 6.0,
+      "target_safetensor_load_seconds": 35.14,
+      "dspark_safetensor_load_seconds": 2.89,
+      "checkpoint_eviction_trigger_seconds": 710.9,
+      "target_compile_bucket_seconds": {
+        "16": 50.06,
+        "40": 49.88,
+        "48": 49.60,
+        "64": 47.01,
+        "96": 50.98,
+        "192": 54.90,
+        "288_profile": 61.71,
+        "288_final": 79.06
+      },
+      "compile_cache_archive": {
+        "gcs_uri": "gs://ank-usc1-bucket-314837540096/dsv41-v7x-llmd-20261106/compile_cache/compile_cache_decode_ep16_xla.tar.gz",
+        "size_mb": 889.69,
+        "pack_seconds": 41.19,
+        "upload_seconds": 13.36
+      }
+    },
+    "verification": {
+      "vllm_9400_health": 200,
+      "vllm_9400_models": 200,
+      "sidecar_8000_health": 200,
+      "sidecar_8000_models": 200,
+      "epp_router_80_models": 200,
+      "epp_endpoint_registered": "default/llmd-decode-ep16-0-rank-0",
+      "standalone_decode_sanity_9400": {
+        "http_status": 200,
+        "system_fingerprint": "vllm-0.29.0-dp16-ep-cc49ecd2",
+        "prompt": "Compute 17 * 23 and give the integer result.",
+        "answer": "391",
+        "finish_reason": "stop"
+      }
+    }
+  }
+}
