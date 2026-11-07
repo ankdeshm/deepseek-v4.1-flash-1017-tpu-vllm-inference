@@ -1,0 +1,51 @@
+=== tpu-info snapshot (r3_c768) rc=0 ===
+Libtpu version: 0.0.48                                                          
+Accelerator type: 7x                                                            
+                                                                                
+TPU Chips                                          
+┏━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Chip        ┃ Type       ┃ Devices ┃ PID        ┃
+┡━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━┩
+│ /dev/vfio/1 │ TPU7x chip │ 2       │ 2878, 2873 │
+│ /dev/vfio/2 │ TPU7x chip │ 2       │ 2884, 2887 │
+│ /dev/vfio/3 │ TPU7x chip │ 2       │ 2869, 2875 │
+│ /dev/vfio/4 │ TPU7x chip │ 2       │ 2866, 2881 │
+└─────────────┴────────────┴─────────┴────────────┘
+TPU Runtime Utilization                      
+┏━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Chip ┃ HBM Usage (GiB)       ┃ Duty cycle ┃
+┡━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ 0    │ 73.44 GiB / 94.74 GiB │ 48.12%     │
+│ 0    │ 73.14 GiB / 94.74 GiB │ 48.05%     │
+│ 1    │ 73.44 GiB / 94.74 GiB │ 47.77%     │
+│ 1    │ 73.44 GiB / 94.74 GiB │ 47.69%     │
+│ 2    │ 73.44 GiB / 94.74 GiB │ 48.04%     │
+│ 2    │ 75.36 GiB / 94.74 GiB │ 47.35%     │
+│ 3    │ 73.44 GiB / 94.74 GiB │ 47.89%     │
+│ 3    │ 73.44 GiB / 94.74 GiB │ 47.09%     │
+└──────┴───────────────────────┴────────────┘
+TensorCore Utilization              
+┏━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Core ID ┃ TensorCore Utilization ┃
+┡━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 0       │ 22.93%                 │
+│ 1       │ 23.10%                 │
+│ 2       │ 22.93%                 │
+│ 3       │ 23.18%                 │
+│ 4       │ 22.68%                 │
+│ 5       │ 23.10%                 │
+│ 6       │ 22.68%                 │
+│ 7       │ 23.18%                 │
+└─────────┴────────────────────────┘
+╭─────────────────────── Buffer Transfer Latency Status ───────────────────────╮
+│ WARNING: Buffer Transfer Latency metrics unavailable. Did you start a        │
+│ MULTI_SLICE workload with `TPU_RUNTIME_METRICS_PORTS=8431,8432,8433,8434`?   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────── gRPC TCP Minimum RTT Status ─────────────────────────╮
+│ WARNING: gRPC TCP Minimum RTT metrics unavailable. Did you start a           │
+│ MULTI_SLICE workload with `TPU_RUNTIME_METRICS_PORTS=8431,8432,8433,8434`?   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────── gRPC TCP Delivery Rate Status ────────────────────────╮
+│ WARNING: gRPC TCP Delivery Rate metrics unavailable. Did you start a         │
+│ MULTI_SLICE workload with `TPU_RUNTIME_METRICS_PORTS=8431,8432,8433,8434`?   │
+╰──────────────────────────────────────────────────────────────────────────────╯
