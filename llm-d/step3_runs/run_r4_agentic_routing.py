@@ -55,6 +55,23 @@ CHARS_PER_TOKEN = 3.85
 # the prior 7,446 / 14,542 runs): X-data-parallel-rank = trunk_id % DP_PIN_RANKS on every request.
 # 0 = disabled (vLLM's internal DP load balancer picks the rank inside each prefill/decode instance).
 DP_PIN_RANKS = 0
+DP_PIN_MAP: dict[int, int] = {}
+
+
+def build_balanced_dp_map(all_trunks: list[dict[str, Any]], trunks_by_bucket: dict[int, list[dict[str, Any]]], n_ranks: int) -> dict[int, int]:
+    """Greedy LPT trunk->rank map weighted by expected token load (bucket share / trunks-in-bucket x ISL)."""
+    loads = [0.0] * n_ranks
+    weighted = []
+    for t in all_trunks:
+        b = t["bucket_idx"]
+        share = ISL_BUCKETS[b][1] / max(1, len(trunks_by_bucket.get(b, [])))
+        weighted.append((share * float(t["target_isl_tokens"]), int(t["trunk_id"])))
+    out: dict[int, int] = {}
+    for w, tid in sorted(weighted, reverse=True):
+        r = min(range(n_ranks), key=lambda i: loads[i])
+        out[tid] = r
+        loads[r] += w
+    return out
 
 ISL_BUCKETS = [
     ("1-8K", 0.50, 5376, 8064),
@@ -372,7 +389,8 @@ async def send_chat_request(
         "X-Session-ID": f"trunk-{meta.get('trunk_id', 0)}",
     }
     if DP_PIN_RANKS > 0:
-        headers["X-data-parallel-rank"] = str(int(meta.get("trunk_id", 0)) % DP_PIN_RANKS)
+        tid = int(meta.get("trunk_id", 0))
+        headers["X-data-parallel-rank"] = str(DP_PIN_MAP.get(tid, tid % DP_PIN_RANKS))
     if extra_headers:
         headers.update(extra_headers)
 
@@ -1090,6 +1108,13 @@ async def main_async(args: argparse.Namespace) -> None:
 
     raw_reqs, all_sampling_specs = load_dataset(args.dataset)
     all_trunks, trunks_by_bucket = build_global_trunk_pool(args.num_trunks)
+    global DP_PIN_MAP
+    if DP_PIN_RANKS > 0 and getattr(args, "dp_pin_mode", "balanced") == "balanced":
+        DP_PIN_MAP = build_balanced_dp_map(all_trunks, trunks_by_bucket, DP_PIN_RANKS)
+        print(f"[R4/R6] DP pinning: balanced trunk->rank map over {DP_PIN_RANKS} ranks (rank trunk counts="
+              f"{[list(DP_PIN_MAP.values()).count(r) for r in range(DP_PIN_RANKS)]})", flush=True)
+    elif DP_PIN_RANKS > 0:
+        print(f"[R4/R6] DP pinning: trunk_id % {DP_PIN_RANKS}", flush=True)
     bucket_counts = {ISL_BUCKETS[b][0]: len(trunks_by_bucket[b]) for b in range(len(ISL_BUCKETS))}
     print(
         f"[R4/R6 INIT] routing_mode={args.routing_label} | trunks={len(all_trunks)} {bucket_counts} | "
@@ -1159,6 +1184,7 @@ async def main_async(args: argparse.Namespace) -> None:
                 "target_cache_hit_ratio": args.cache_hit_rate,
                 "reset_cache_between_levels": False,
                 "dp_pin_ranks": DP_PIN_RANKS,
+                "dp_pin_mode": (getattr(args, "dp_pin_mode", "balanced") if DP_PIN_RANKS > 0 else "off"),
                 "warmup": warmup_summary,
                 "levels": level_summaries,
             }
@@ -1203,6 +1229,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--timeout", type=float, default=3600.0)
     ap.add_argument("--save-requests-dir", default="")
     ap.add_argument("--output-json", default="/tmp/r4_summary.json")
+    ap.add_argument("--dp-pin-mode", default="balanced", choices=["balanced", "mod"],
+                    help="balanced = greedy load-weighted trunk->rank map; mod = trunk_id %% N (used by R4 conditions c/d)")
     ap.add_argument("--dp-pin-ranks", type=int, default=0,
                     help="0=off; N>0 adds X-data-parallel-rank=trunk_id%%N (client DP affinity, as in toy_proxy_server.py)")
     return ap.parse_args()
