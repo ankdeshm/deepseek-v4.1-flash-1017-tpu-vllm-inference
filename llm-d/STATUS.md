@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T09:17:26Z`
+- **Last Updated (UTC):** `2026-11-07T09:22:19Z`
 
 ---
 
@@ -23,7 +23,7 @@
 | `2026-11-07T05:52Z` | **STEP 3 `R3`: Decode-Only Ceiling (`S1` `~99.5%` Cached, `2P2D` `EP=8`)** | **COMPLETE (Ceiling `44,100.66` out tok/s @ `c=1024`)** | Swept `c = 256, 384, 512, 768, 1024` (`~99.5%` prefix hit, Prefill `<5%` busy). True Decode Ceiling **`44,100.66` out tok/s** (**`5,512.58`/dec-chip**, **`2,756.29`/tot-chip**) at `c=1024`, `DSpark tau = 4.14..4.15`, `0 / 47,647` failures. | Proceed to Step 4 `R4` (`Agentic Prefix-Aware Routing`). |
 | `2026-11-07T08:29Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **COMPLETE (4 conditions)** | `roundrobin` (n=64,128,256): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=64,128,256): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | `R6` running, then `R5`. |
 | `2026-11-07T08:32Z` | **STEP 3 `R6`: Agentic Continuity (`~95%` hit, `2P2D`, prefix-aware + balanced DP pin)** | **COMPLETE** | n=128: hit `95.32%`, out `8,529.90` tok/s, TTFT P50/P95 `0.965/1.452` s; n=256: hit `95.31%`, out `10,753.45` tok/s (`1,344.18`/dec-chip), TTFT P50/P95 `1.154/1.597` s; `0` failures | `R5` (`1P3D`) deploying. |
-| `2026-11-07T09:17Z` | **STEP 3 `R5`: Ratio Check `1P3D` (`S1`)** | **IN PROGRESS** | Peak `14,951.41` out tok/s @ `c=128` (`1,245.95`/dec-chip `/12`, `934.46`/tot-chip) | Continue ladder. |
+| `2026-11-07T09:22Z` | **STEP 3 `R5`: Ratio Check `1P3D` (`S1`)** | **IN PROGRESS** | Peak `22,459.46` out tok/s @ `c=256` (`1,871.62`/dec-chip `/12`, `1,403.72`/tot-chip) | Continue ladder. |
 
 
 ---
@@ -209,4 +209,5 @@
 | **`c=32`** | **`4,200.53`** *(base)* | **`350.04`** | **`262.53`** | `8,519.68` | `146.25 / 116.87 / 102.56` | `0.417 / 0.980 / 1.486` | `3.6995` | `1.25` | `0.00` | `4,149.10` / `518.64` | `+1.2%` | `0.0` | **`0 / 1249`** |
 | **`c=64`** | **`7,773.56`** (`+85.06%`) | **`647.80`** | **`485.85`** | `15,701.33` | `135.48 / 118.00 / 106.78` | `0.868 / 1.333 / 1.620` | `3.9234` | `2.42` | `0.00` | `8,044.30` / `1,005.54` | `-3.4%` | `0.0` | **`0 / 2309`** |
 | **`c=128`** | **`14,951.41`** (`+92.34%`) | **`1,245.95`** | **`934.46`** | `30,194.35` | `133.71 / 116.04 / 106.58` | `0.979 / 1.823 / 2.275` | `4.0539` | `4.78` | `0.06` | `13,562.52` / `1,695.32` | `+10.2%` | `0.0` | **`0 / 4454`** |
+| **`c=256`** | **`22,459.46`** (`+50.22%`) | **`1,871.62`** | **`1,403.72`** | `45,711.36` | `102.95 / 88.66 / 79.96` | `1.214 / 2.112 / 4.715` | `4.1137` | `9.46` | `0.53` | `18,931.05` / `2,366.38` | `+18.6%` | `0.0` | **`0 / 6722`** |
 <!-- R5_RESULTS_END -->
