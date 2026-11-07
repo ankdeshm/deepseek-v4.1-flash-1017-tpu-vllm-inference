@@ -62,4 +62,4 @@ All manifests, scripts, raw server logs, Prometheus `/metrics` snapshots, timese
   - `prefill_metrics_{before,mid,after}.txt`, `decode_metrics_{before,mid,after}.txt`
   - `pd_prefill.log`, `pd_decode.log`, `pd_proxy.log`, `pd_setup_prefill.log`, `pd_setup_decode.log`
   - `pass1/` (archived Pass 1 300s run + metrics)
-  - Full non-truncated `PYTHONHASHSEED=0` compile caches uploaded via direct GCS REST API: `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/compile_cache/compile_cache_{prefill,decode}_dp8_phs0.tar.gz`
+  - Warm compile-cache recovery helper in `step1_r0_driver.py` (`restore_warm_compile_cache()`) for `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/compile_cache/compile_cache_{prefill,decode}_dp8.tar.gz`
