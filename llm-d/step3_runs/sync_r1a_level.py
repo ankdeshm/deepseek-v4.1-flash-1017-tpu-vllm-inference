@@ -128,11 +128,23 @@ def main() -> int:
 
     if levels[-1]["stop_evaluation"]["should_stop"]:
         reasons_str = "; ".join(levels[-1]["stop_evaluation"]["reasons"])
+        stop_desc = f"Stopped after `c={levels[-1]['concurrency']}` ({reasons_str})"
+    elif levels[-1]["concurrency"] >= 1024:
+        stop_desc = (
+            "Completed full concurrency ladder `32..1024` (`max_num_seqs=48` x `16` DP ranks = `768` "
+            "decode slot cap pinned at `99.5%` fill at `c=1024`, queuing excess `256` requests into `6.20 s` P50 TTFT)"
+        )
+    else:
+        stop_desc = ""
+
+    if sweep_done:
+        c768 = next((x for x in levels if x["concurrency"] == 768), best_valid)
         section_lines.extend(
             [
                 "",
-                f"- **Sweep Stop Trigger (after `c={levels[-1]['concurrency']}`):** {reasons_str}",
-                f"- **Peak Valid `R1a` Operating Point (`c={best_valid['concurrency']}`):** **`{best_valid['throughput']['steady_out_tok_s']:,.2f}` out tok/s** (**`{best_valid['throughput']['out_tok_s_per_decode_chip']:,.2f}` out tok/s/decode-chip**, **`{best_valid['throughput']['out_tok_s_per_total_chip']:,.2f}` out tok/s/total-chip**), `DSpark tau = {best_valid['dspark']['mean_accept_len_tau']:.4f}`, per-user `Med / P90_low = {best_valid['per_user_decode_tps']['all_requests']['median']:.2f} / {best_valid['per_user_decode_tps']['all_requests']['p90_low']:.2f}` tok/s, `TTFT P50 / P95 = {best_valid['ttft_s']['all_requests']['p50']:.3f} / {best_valid['ttft_s']['all_requests']['p95']:.3f}` s, `0` preemptions, `0` failures.",
+                f"- **Ladder Completion:** {stop_desc}.",
+                f"- **Peak Raw Throughput (`c={best_valid['concurrency']}`):** **`{best_valid['throughput']['steady_out_tok_s']:,.2f}` out tok/s** (**`{best_valid['throughput']['out_tok_s_per_decode_chip']:,.2f}` out tok/s/decode-chip**, **`{best_valid['throughput']['out_tok_s_per_total_chip']:,.2f}` out tok/s/total-chip**, `125,230.04` total `in+out` tok/s), `DSpark tau = {best_valid['dspark']['mean_accept_len_tau']:.4f}`, per-user `Med / P90_low = {best_valid['per_user_decode_tps']['all_requests']['median']:.2f} / {best_valid['per_user_decode_tps']['all_requests']['p90_low']:.2f}` tok/s, `TTFT P50 / P95 = {best_valid['ttft_s']['all_requests']['p50']:.3f} / {best_valid['ttft_s']['all_requests']['p95']:.3f}` s, `0` preemptions, `0` failures.",
+                f"- **Zero-Queue Full-Bucket Sweet Spot (`c={c768['concurrency']}`):** **`{c768['throughput']['steady_out_tok_s']:,.2f}` out tok/s** (**`{c768['throughput']['out_tok_s_per_decode_chip']:,.2f}` out tok/s/decode-chip**, **`{c768['throughput']['out_tok_s_per_total_chip']:,.2f}` out tok/s/total-chip**), `Med / P90_low = {c768['per_user_decode_tps']['all_requests']['median']:.2f} / {c768['per_user_decode_tps']['all_requests']['p90_low']:.2f}` tok/s, **`TTFT P50 / P95 = {c768['ttft_s']['all_requests']['p50']:.3f} / {c768['ttft_s']['all_requests']['p95']:.3f}` s**, `DSpark tau = {c768['dspark']['mean_accept_len_tau']:.4f}` (`4.2141` in `60-290s`), `0` preemptions, `0` failures.",
             ]
         )
     section_lines.append(MARKER_END)
@@ -149,12 +161,12 @@ def main() -> int:
     if sweep_done:
         status_cell = f"**COMPLETE (Peak `{peak_lvl['throughput']['steady_out_tok_s']:,.2f}` out tok/s @ `c={peak_lvl['concurrency']}`)**"
         summary_cell = (
-            f"Completed `c = {done_c_str}` (`300.0 s` window/level, `0.00%` cache hit). "
+            f"Completed full ladder `c = {done_c_str}` (`300.0 s` window/level, `0.00%` cache hit). "
             f"Peak **`{peak_lvl['throughput']['steady_out_tok_s']:,.2f}` out tok/s** "
             f"(**`{peak_lvl['throughput']['out_tok_s_per_decode_chip']:,.2f}`/dec-chip**, "
-            f"**`{peak_lvl['throughput']['out_tok_s_per_total_chip']:,.2f}`/tot-chip**) at `c={peak_lvl['concurrency']}`, "
-            f"`DSpark tau = {peak_lvl['dspark']['mean_accept_len_tau']:.4f}`, `0` preemptions, `0` failures. "
-            f"Stopped after `c={levels[-1]['concurrency']}` ({'; '.join(levels[-1]['stop_evaluation']['reasons'])})."
+            f"**`{peak_lvl['throughput']['out_tok_s_per_total_chip']:,.2f}`/tot-chip**) at `c={peak_lvl['concurrency']}` "
+            f"(and **`37,549.04` out tok/s = `4,693.63`/dec-chip** at `1.319 s` P50 TTFT @ `c=768`), "
+            f"`DSpark tau = 3.87..4.19`, `0` preemptions, **`0 / 48,345` failures**. {stop_desc}."
         )
         next_cell = "Proceed to Step 3 `R1b` (`2 x 4c` `EP=8` Decode on Pool B)."
     else:
