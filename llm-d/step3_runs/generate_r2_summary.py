@@ -77,7 +77,7 @@ def fmt_rule4_table(levels: list[dict]) -> list[str]:
             f"`{tt_a['p50']:.3f} / {tt_a['p95']:.3f} / {tt_a['p99']:.3f}` | "
             f"`{tt_w['p50']:.3f} / {tt_w['p95']:.3f} / {tt_w['p99']:.3f}` | "
             f"`{tpot_a['p50']:.2f} / {tpot_a['p95']:.2f} / {tpot_a['p99']:.2f}` | "
-            f"**`{ds['mean_accept_len_tau']:.4f}`** / `{ds['mean_accept_len_tau_60_290']}` | "
+            f"**`{ds['mean_accept_len_tau']:.4f}`** / `{ds.get('mean_accept_len_tau_60_290', ds.get('steady_60_290_tau', '—'))}` | "
             f"`{db['per_dp_rank_mean']:.2f} / {db['per_dp_rank_median']:.1f} / {db['per_dp_rank_max']:.1f}` (`{db['total_running_mean']:.1f}` tot) | "
             f"`D`: `{kv['decode_steady_mean_pct']:.3f}% / {kv['decode_peak_single_rank_pct']:.3f}%` · "
             f"`P`: `{kv['prefill_steady_mean_pct']:.3f}% / {kv['prefill_peak_single_rank_pct']:.3f}%` | "
