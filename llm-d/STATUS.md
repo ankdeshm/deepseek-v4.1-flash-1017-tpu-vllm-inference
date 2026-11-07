@@ -23,6 +23,7 @@
 | `2026-11-07T05:52Z` | **STEP 3 `R3`: Decode-Only Ceiling (`S1` `~99.5%` Cached, `2P2D` `EP=8`)** | **COMPLETE (Ceiling `44,100.66` out tok/s @ `c=1024`)** | Swept `c = 256, 384, 512, 768, 1024` (`~99.5%` prefix hit, Prefill `<5%` busy). True Decode Ceiling **`44,100.66` out tok/s** (**`5,512.58`/dec-chip**, **`2,756.29`/tot-chip**) at `c=1024`, `DSpark tau = 4.14..4.15`, `0 / 47,647` failures. | Proceed to Step 4 `R4` (`Agentic Prefix-Aware Routing`). |
 | `2026-11-07T08:29Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **COMPLETE (4 conditions)** | `roundrobin` (n=64,128,256): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=64,128,256): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | `R6` running, then `R5`. |
 | `2026-11-07T08:32Z` | **STEP 3 `R6`: Agentic Continuity (`~95%` hit, `2P2D`, prefix-aware + balanced DP pin)** | **COMPLETE** | n=128: hit `95.32%`, out `8,529.90` tok/s, TTFT P50/P95 `0.965/1.452` s; n=256: hit `95.31%`, out `10,753.45` tok/s (`1,344.18`/dec-chip), TTFT P50/P95 `1.154/1.597` s; `0` failures | `R5` (`1P3D`) deploying. |
+| `2026-11-07T09:00Z` | **STEP 3 `R5`: Ratio Check `1P3D` (`S1`)** | **IN PROGRESS** | `llmd-decode-poola-h1` ready; S1 ladder running. | Complete `R5`, then FINAL REPORT. |
 
 
 ---

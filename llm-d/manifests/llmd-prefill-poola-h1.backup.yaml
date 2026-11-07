@@ -1,0 +1,415 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    gke-gcsfuse/volumes: "true"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict":"false","gke-gcsfuse/volumes":"true"},"labels":{"app":"llmd-prefill-poola","llm-d.ai/guide":"pd-disaggregation","llm-d.ai/inference-serving":"true","llm-d.ai/role":"prefill","role":"prefill"},"name":"llmd-prefill-poola-h1","namespace":"default"},"spec":{"containers":[{"command":["bash","-lc","for i in $(seq 1 30); do\n  [ -f /models/dsv41-v7x-llmd-20261106/step2_llmd/step2_prefill_poola_driver.py ] \u0026\u0026 break\n  sleep 1\ndone\nexec python3 -u /models/dsv41-v7x-llmd-20261106/step2_llmd/step2_prefill_poola_driver.py --shard=h1\n"],"env":[{"name":"PJRT_DEVICE","value":"TPU"},{"name":"PYTHONHASHSEED","value":"0"},{"name":"VLLM_HTTP_TIMEOUT_KEEP_ALIVE","value":"120"}],"image":"docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6","imagePullPolicy":"IfNotPresent","name":"vllm-prefill","ports":[{"containerPort":8000,"name":"http","protocol":"TCP"},{"containerPort":9100,"name":"tpu-kv-xfer-p","protocol":"TCP"},{"containerPort":14579,"name":"kv-rendezvous","protocol":"TCP"},{"containerPort":9600,"name":"tpu-pd-coord","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/v1/models","port":8000},"periodSeconds":5,"timeoutSeconds":3},"resources":{"limits":{"google.com/tpu":"4"},"requests":{"google.com/tpu":"4"}},"securityContext":{"privileged":true},"volumeMounts":[{"mountPath":"/dev/shm","name":"dshm"},{"mountPath":"/var/run/tpu-plugin","name":"tpu-plugin"},{"mountPath":"/models","name":"models-gcs"}]}],"dnsPolicy":"ClusterFirstWithHostNet","hostNetwork":true,"nodeSelector":{"cloud.google.com/gke-nodepool":"ank-tpu-v7x-8-pool-a","cloud.google.com/gke-tpu-accelerator":"tpu7x","cloud.google.com/gke-tpu-topology":"2x2x2","kubernetes.io/hostname":"gke-tpu-51ea19d7-xq6s"},"restartPolicy":"Never","serviceAccountName":"default","tolerations":[{"effect":"NoSchedule","key":"google.com/tpu","operator":"Exists"},{"effect":"NoSchedule","key":"cloud.google.com/gke-queued","operator":"Exists"}],"volumes":[{"hostPath":{"path":"/dev/shm","type":"Directory"},"name":"dshm"},{"hostPath":{"path":"/var/run/tpu-plugin","type":"DirectoryOrCreate"},"name":"tpu-plugin"},{"name":"models-gcs","persistentVolumeClaim":{"claimName":"ank-usc1-models-pvc"}}]}}
+  creationTimestamp: "2026-11-07T00:20:47Z"
+  generation: 1
+  labels:
+    app: llmd-prefill-poola
+    llm-d.ai/guide: pd-disaggregation
+    llm-d.ai/inference-serving: "true"
+    llm-d.ai/role: prefill
+    role: prefill
+    topology.kubernetes.io/region: us-central1
+    topology.kubernetes.io/zone: us-central1-c
+  name: llmd-prefill-poola-h1
+  namespace: default
+  resourceVersion: "1794040234721423008"
+  uid: 02d644b1-ce93-4787-8bee-0ee6807e0645
+spec:
+  containers:
+  - command:
+    - bash
+    - -lc
+    - |
+      for i in $(seq 1 30); do
+        [ -f /models/dsv41-v7x-llmd-20261106/step2_llmd/step2_prefill_poola_driver.py ] && break
+        sleep 1
+      done
+      exec python3 -u /models/dsv41-v7x-llmd-20261106/step2_llmd/step2_prefill_poola_driver.py --shard=h1
+    env:
+    - name: PJRT_DEVICE
+      value: TPU
+    - name: PYTHONHASHSEED
+      value: "0"
+    - name: VLLM_HTTP_TIMEOUT_KEEP_ALIVE
+      value: "120"
+    - name: TPU_WORKER_ID
+      value: "0"
+    - name: TPU_LOG_DIR
+      value: /tmp/tpu_logs/vllm-prefill
+    - name: TPU_PROCESS_PORT
+      value: "8471"
+    - name: TPU_PROCESS_ADDRESSES
+      value: localhost:8471
+    - name: TPU_WORKER_HOSTNAMES
+      value: localhost
+    image: docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6
+    imagePullPolicy: IfNotPresent
+    name: vllm-prefill
+    ports:
+    - containerPort: 8000
+      hostPort: 8000
+      name: http
+      protocol: TCP
+    - containerPort: 9100
+      hostPort: 9100
+      name: tpu-kv-xfer-p
+      protocol: TCP
+    - containerPort: 14579
+      hostPort: 14579
+      name: kv-rendezvous
+      protocol: TCP
+    - containerPort: 9600
+      hostPort: 9600
+      name: tpu-pd-coord
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /v1/models
+        port: 8000
+        scheme: HTTP
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources:
+      limits:
+        google.com/tpu: "4"
+      requests:
+        google.com/tpu: "4"
+    securityContext:
+      privileged: true
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /dev/shm
+      name: dshm
+    - mountPath: /var/run/tpu-plugin
+      name: tpu-plugin
+    - mountPath: /models
+      name: models-gcs
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-v5xx4
+      readOnly: true
+  dnsPolicy: ClusterFirstWithHostNet
+  enableServiceLinks: true
+  hostNetwork: true
+  initContainers:
+  - args:
+    - --v=5
+    env:
+    - name: NATIVE_SIDECAR
+      value: "TRUE"
+    image: us-central1-artifactregistry.gcr.io/gke-release/gke-release/gcs-fuse-csi-driver-sidecar-mounter:v1.23.30-gke.1@sha256:79b0692c616df706adb7ecdfd20efd026e8cc15de44fd03dc42fd8f814446b21
+    imagePullPolicy: IfNotPresent
+    name: gke-gcsfuse-sidecar
+    resources:
+      requests:
+        cpu: 250m
+        ephemeral-storage: 5Gi
+        memory: 256Mi
+    restartPolicy: Always
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsGroup: 65534
+      runAsNonRoot: true
+      runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /gcsfuse-tmp
+      name: gke-gcsfuse-tmp
+    - mountPath: /gcsfuse-buffer
+      name: gke-gcsfuse-buffer
+    - mountPath: /gcsfuse-cache
+      name: gke-gcsfuse-cache
+    - mountPath: /gcsfuse-sa-token
+      name: gcsfuse-sa-token
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-v5xx4
+      readOnly: true
+  - env:
+    - name: NATIVE_SIDECAR
+      value: "TRUE"
+    image: us-central1-artifactregistry.gcr.io/gke-release/gke-release/gcs-fuse-csi-driver-metadata-prefetch:v1.23.30-gke.1@sha256:daf68af5cefc09eb9c4efc11d3c72248f05b7b4357e9edcdf2dfa45f94e494c4
+    imagePullPolicy: IfNotPresent
+    name: gke-gcsfuse-metadata-prefetch
+    resources:
+      requests:
+        cpu: 50m
+        ephemeral-storage: 10Mi
+        memory: 10Mi
+    restartPolicy: Always
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsGroup: 65534
+      runAsNonRoot: true
+      runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /volumes/models-gcs
+      name: models-gcs
+      readOnly: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-v5xx4
+      readOnly: true
+  nodeName: gke-tpu-51ea19d7-xq6s
+  nodeSelector:
+    cloud.google.com/gke-accelerator-count: "4"
+    cloud.google.com/gke-nodepool: ank-tpu-v7x-8-pool-a
+    cloud.google.com/gke-tpu-accelerator: tpu7x
+    cloud.google.com/gke-tpu-topology: 2x2x2
+    kubernetes.io/hostname: gke-tpu-51ea19d7-xq6s
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Never
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoSchedule
+    key: google.com/tpu
+    operator: Exists
+  - effect: NoSchedule
+    key: cloud.google.com/gke-queued
+    operator: Exists
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - emptyDir: {}
+    name: gke-gcsfuse-tmp
+  - emptyDir: {}
+    name: gke-gcsfuse-buffer
+  - emptyDir: {}
+    name: gke-gcsfuse-cache
+  - hostPath:
+      path: /dev/shm
+      type: Directory
+    name: dshm
+  - hostPath:
+      path: /var/run/tpu-plugin
+      type: DirectoryOrCreate
+    name: tpu-plugin
+  - name: models-gcs
+    persistentVolumeClaim:
+      claimName: ank-usc1-models-pvc
+  - name: kube-api-access-v5xx4
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+  - name: gcsfuse-sa-token
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          audience: diesel-patrol-382622.svc.id.goog
+          expirationSeconds: 3600
+          path: token
+status:
+  allocatedResources:
+    cpu: 300m
+    ephemeral-storage: 5130Mi
+    google.com/tpu: "4"
+    memory: 266Mi
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-07T00:20:48Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-07T00:20:50Z"
+    observedGeneration: 1
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-07T00:45:20Z"
+    observedGeneration: 1
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-07T00:45:20Z"
+    observedGeneration: 1
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-11-07T00:20:47Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - allocatedResources:
+      google.com/tpu: "4"
+    allocatedResourcesStatus:
+    - name: google.com/tpu
+      resources:
+      - health: Healthy
+        resourceID: "0000:00:03"
+      - health: Healthy
+        resourceID: "0000:00:04"
+      - health: Healthy
+        resourceID: 0000:c0:00
+      - health: Healthy
+        resourceID: 0000:c0:02
+    containerID: containerd://4d7730b7e8dedf8cce0f65a7c6ed096c33f04fbdf9e5fca171b59b5ad9968db4
+    image: sha256:f0c5da51027279c242c8a3075ab63ddd2d9092f622811c6c5cd5b295851cd716
+    imageID: docker.io/vllm/vllm-tpu@sha256:f9565be370a7af2b631198aa95f891221a974b2b1727d22db9b275923d3261c6
+    lastState: {}
+    name: vllm-prefill
+    ready: true
+    resources:
+      limits:
+        google.com/tpu: "4"
+      requests:
+        google.com/tpu: "4"
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-11-07T00:20:50Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /dev/shm
+      name: dshm
+    - mountPath: /var/run/tpu-plugin
+      name: tpu-plugin
+    - mountPath: /models
+      name: models-gcs
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-v5xx4
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.100.38
+  hostIPs:
+  - ip: 192.168.100.38
+  initContainerStatuses:
+  - allocatedResources:
+      cpu: 250m
+      ephemeral-storage: 5Gi
+      memory: 256Mi
+    containerID: containerd://91acd400b1373489f0bfafd2bfb4e053be960e034d6cf9ae1f07bcc9508fdaeb
+    image: sha256:c155f57b7db22f7800eded2db9592a0256e4c512c496a81ac50a094bef0f8cec
+    imageID: us-central1-artifactregistry.gcr.io/gke-release/gke-release/gcs-fuse-csi-driver-sidecar-mounter@sha256:79b0692c616df706adb7ecdfd20efd026e8cc15de44fd03dc42fd8f814446b21
+    lastState: {}
+    name: gke-gcsfuse-sidecar
+    ready: true
+    resources:
+      requests:
+        cpu: 250m
+        ephemeral-storage: 5Gi
+        memory: 256Mi
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-11-07T00:20:48Z"
+    user:
+      linux:
+        gid: 65534
+        supplementalGroups:
+        - 65534
+        uid: 65534
+    volumeMounts:
+    - mountPath: /gcsfuse-tmp
+      name: gke-gcsfuse-tmp
+    - mountPath: /gcsfuse-buffer
+      name: gke-gcsfuse-buffer
+    - mountPath: /gcsfuse-cache
+      name: gke-gcsfuse-cache
+    - mountPath: /gcsfuse-sa-token
+      name: gcsfuse-sa-token
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-v5xx4
+      readOnly: true
+      recursiveReadOnly: Disabled
+  - allocatedResources:
+      cpu: 50m
+      ephemeral-storage: 10Mi
+      memory: 10Mi
+    containerID: containerd://fdd7cb2c940e66f842e6244a734c8d4e287dd6e948799c212829b899bfe055ac
+    image: sha256:e5009069f10a53f1352eee1ca779ccc38d7e40b67aafe20073c845de306e85d5
+    imageID: us-central1-artifactregistry.gcr.io/gke-release/gke-release/gcs-fuse-csi-driver-metadata-prefetch@sha256:daf68af5cefc09eb9c4efc11d3c72248f05b7b4357e9edcdf2dfa45f94e494c4
+    lastState: {}
+    name: gke-gcsfuse-metadata-prefetch
+    ready: true
+    resources:
+      requests:
+        cpu: 50m
+        ephemeral-storage: 10Mi
+        memory: 10Mi
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-11-07T00:20:49Z"
+    user:
+      linux:
+        gid: 65534
+        supplementalGroups:
+        - 65534
+        uid: 65534
+    volumeMounts:
+    - mountPath: /volumes/models-gcs
+      name: models-gcs
+      readOnly: true
+      recursiveReadOnly: Disabled
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-v5xx4
+      readOnly: true
+      recursiveReadOnly: Disabled
+  observedGeneration: 1
+  phase: Running
+  podIP: 192.168.100.38
+  podIPs:
+  - ip: 192.168.100.38
+  qosClass: Burstable
+  resources:
+    requests:
+      cpu: 284m
+      memory: 266Mi
+  startTime: "2026-11-07T00:20:47Z"
