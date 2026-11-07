@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T04:43:22Z`
+- **Last Updated (UTC):** `2026-11-07T04:49:37Z`
 
 ---
 
@@ -19,7 +19,7 @@
 | `2026-11-07T01:15Z` | **STEP 2: `llm-d` v1.0.0 Path A + Pool A `2x4c` Prefill + Pool B `1x8c` `EP=16` LWS Decode + Correctness Gate** | **PASS (`20/20` Greedy Gate)** | **Path A (`llm-d v1.0.0` + GAIE `v1.6.2` `InferencePool` + `EndpointPicker` + `llm-d-router-disagg-sidecar:v1.0.0` `nixlv2` -> `TPURaidenConnector` Stage-3):** Pool A `2 x 4-chip` `DP=8, EP=8` Prefill (`llmd-prefill-poola-h{0,1}`) + Pool B `1 x 8-chip` `LeaderWorkerSet` `DP=16, EP=16` Decode (`llmd-decode-ep16`, **`29.28 GiB` weights/core, `51.25 GiB` KV HBM/core = `99.90M` FP8 KV tokens across 8 chips**). **Step 2e Correctness Gate PASS:** `16/16` QA sanity + **`20/20` (`100%`) bit-exact 64-token greedy parity** vs single local server, `DSpark tau = 5.16` (structured) / `2.41` (open-ended), active EPP routing across `h0` & `h1`. | Run Step 3 `R1a` (`S1 = 2048:1024`, `EP=16` Decode, `n = 32..1024`, `300 s`/level). |
 | `2026-11-07T02:19Z` | **STEP 3 `R1a`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`1x8c` `EP=16` Pool B)** | **COMPLETE (Peak `40,907.05` out tok/s @ `c=1024`)** | Completed full ladder `c = 32, 64, 128, 256, 384, 512, 768, 1024` (`300.0 s` window/level, `0.00%` cache hit). Peak **`40,907.05` out tok/s** (**`5,113.38`/dec-chip**, **`2,556.69`/tot-chip**) at `c=1024` (and **`37,549.04` out tok/s = `4,693.63`/dec-chip** at `1.319 s` P50 TTFT @ `c=768`), `DSpark tau = 3.87..4.19`, `0` preemptions, **`0 / 48,345` failures**. Completed full concurrency ladder `32..1024` (`max_num_seqs=48` x `16` DP ranks = `768` decode slot cap pinned at `99.5%` fill at `c=1024`, queuing excess `256` requests into `6.20 s` P50 TTFT). | Proceed to Step 3 `R1b` (`2 x 4c` `EP=8` Decode on Pool B). |
 | `2026-11-07T03:54Z` | **STEP 3 `R1b`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`2x4c` `EP=8` Pool B) + `R1` Snapshot** | **COMPLETE (`R1b` Wins `8/8` Levels, Peak `46,822.96` out tok/s)** | Completed ladder `c = 32, 64, 128, 256, 384, 512, 768, 1024` (`300.0 s` window/level, `0.00%` cache hit). Peak **`46,822.96` out tok/s** (**`5,852.87`/dec-chip**, **`2,926.44`/tot-chip**) at `c=1024` (`+14.46%` vs `R1a`), and **`42,719.11` out tok/s** (`5,339.89`/dec-chip, `61.33` tok/s median, `1.284 s` P50 TTFT) at `c=768` (`+13.77%` vs `R1a`; `+93.73%` throughput at `~61 tok/s/user`), `DSpark tau = 3.85..4.18`, **`0 / 58,296` failures**. Published `R1_INTERIM_SNAPSHOT.md`: **`2 x 4c EP=8` wins `8/8` levels (`+13.3%..+46.3%`)**. | Proceed to Step 4 `R2` (`S2`/`S3` multi-shape sweep on winning `2x4c EP=8` Decode). |
-| `2026-11-07T04:43Z` | **STEP 3 `R2`: Matched-Shape Sweep (`S2=1024:1024`, `S3=8192:1024`, `2P2D` `EP=8`)** | **IN PROGRESS (`S2` Done, Starting `S3`)** | **`S2` (`1024:1024`):** `c=32,64,128,256,384,512,768,1024` done, peak **`44,166.04` out tok/s** (`5,520.76`/dec-chip @ `c=1024`, `0/56,152` err). | Run `R2-S3` (`8192:1024`, `c=32..768`). |
+| `2026-11-07T04:49Z` | **STEP 3 `R2`: Matched-Shape Sweep (`S2=1024:1024`, `S3=8192:1024`, `2P2D` `EP=8`)** | **IN PROGRESS (`S2` Done, `S3` Running)** | **`S2` (`1024:1024`):** `c=32,64,128,256,384,512,768,1024` done, peak **`44,166.04` out tok/s** (`5,520.76`/dec-chip @ `c=1024`, `0/56,152` err) · **`S3` (`8192:1024`):** `c=32` running, peak **`3,708.41` out tok/s** (`463.55`/dec-chip, `30,010` in tok/s @ `c=32`, `0/1,103` err). | Complete `R2-S3` (`8192:1024`), then launch `R3`. |
 
 
 ---
@@ -105,5 +105,13 @@
 | **`c=1024`** **STOP** | `300 s` | **`44,166.04`** (`+3.40%`) | **`5,520.76`** | **`2,760.38`** | `44,705.6` | `89,590.68` | `59.13 / 51.78 / 44.29` \| `59.12 / 51.61 / 44.22` | `5.828 / 9.353 / 17.867` | `5.801 / 9.630 / 17.982` | `16.91 / 22.61 / 29.06` | **`3.9412`** | `47.75 / 48.0 / 48.0` (`764.0` tot) | `D`: `10.171% / 11.383%` · `P`: `0.817% / 1.865%` | `P`:`49.8/50.2%` · `D`:`49.9/50.1%` | `0 / 0` | **`0 / 13572`** |
 
 - **Completion:** Stopped after `c=1024` (Rule 1: steady_out_tok_s gain +3.40% < +5.0% vs previous level (42,715.03 -> 44,166.04 tok/s)) (`0 / 56,152` failures). Peak **`44,166.04` out tok/s** (**`5,520.76`/dec-chip**, **`2,760.38`/tot-chip**, `89,590.68` total `in+out` tok/s) at `c=1024` (`DSpark tau = 3.9412`).
+
+### `R2-S3`: `S3 = 8192 : 1024` (`8:1` Prefill-Heavy)
+
+- **Workload:** Exact `ISL = 8,192` tokens (`0.00%` realized prefix cache hit, `/reset_prefix_cache` on all `4` vLLM servers before every level), forced `OSL = 1,024` tokens (`ignore_eos=True, temperature=0.6`), `300.0 s` steady window + full drain per level.
+
+| Level | Window | Steady Out tok/s (Gain) | Out tok/s / Dec Chip (`/8`) | Out tok/s / Tot Chip (`/16`) | Server Gen tok/s (`60-290s`) | Total (`in+out`) tok/s | Per-User tok/s `Med / P90_low / P95_low` (In-Win \| All) | TTFT `P50 / P95 / P99` (s) All-Reqs | TTFT `P50 / P95 / P99` (s) In-Window | TPOT `P50 / P95 / P99` (ms) All-Reqs | `DSpark` $\tau$ | Decode Batch / DP Rank (`mean / med / max`) | KV Usage % `Steady / Peak-Rank` | Pod Split (`P h0/h1` · `D b0/b1`) | Preempt (`P / D`) | Failures |
+|---|---:|---:|---:|---:|---:|---:|---|---|---|---|---|---:|---|---|---|---:|---:|
+| **`c=32`** | `300 s` | **`3,708.41`** *(base)* | **`463.55`** | **`231.78`** | `3,749.1` | `33,718.43` | `137.50 / 110.30 / 98.44` \| `137.72 / 110.63 / 98.64` | `1.104 / 1.532 / 2.015` | `1.103 / 1.536 / 2.017` | `7.26 / 10.14 / 12.78` | **`3.6241`** | `1.78 / 2.0 / 4.0` (`28.4` tot) | `D`: `0.610% / 1.729%` · `P`: `0.026% / 0.471%` | `P`:`49.0/51.0%` · `D`:`49.7/50.3%` | `0 / 0` | **`0 / 1103`** |
 
 <!-- R2_RESULTS_END -->
