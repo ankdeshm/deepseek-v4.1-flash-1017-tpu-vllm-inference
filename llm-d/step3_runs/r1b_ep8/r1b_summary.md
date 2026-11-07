@@ -1,0 +1,50 @@
+# Step 3 (`R1b`) Summary Report — `S1 = 2048 : 1024` (`P` = Pool A `2 x 4c` `EP=8`, `D` = Pool B `2 x 4c` `EP=8`)
+
+- **Cluster:** `ank-tpu-v7x` (`us-central1`, project `YOUR_GCP_PROJECT`)
+- **GCS Artifacts:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/step3_runs/r1b_ep8/`
+- **Completed At (UTC):** `2026-11-07T03:49:53Z`
+
+---
+
+## 1. Topology & Configuration
+
+- **Routing Layer (`llm-d` `v1.0.0` Path A):** Standalone Envoy router (`Service/pd-disaggregation-epp:80`) + `EndpointPicker` (`InferencePool/pd-disaggregation`, `disagg-profile-handler` + `prefill-filter`/`decode-filter` + `token-load-scorer` on Prefill + `active-request-scorer` on Decode) + `llm-d-router-disagg-sidecar:v1.0.0` (`nixlv2` -> `TPURaidenConnector` Stage-3 cross-pool KV transfer).
+- **Prefill Pool (`8` physical `tpu7x` chips on Pool A):** `2 x 4-chip` single-host pods (`llmd-prefill-poola-h0` `192.168.100.43:8000`, `llmd-prefill-poola-h1` `192.168.100.38:8000`), each `DP=8, TP=1, EP=8`, `--kv-cache-dtype fp8`, `kv_producer`.
+- **Decode Pool (`8` physical `tpu7x` chips on Pool B):** `2 x 4-chip` independent single-host pods (`llmd-decode-poolb-h0` `192.168.100.198:8000->9400` on `059c` + `llmd-decode-poolb-h1` `192.168.100.199:8000->9400` on `cz6l`), each `DP=8, TP=1, EP=8` (`16` total DP ranks across the two instances), `--kv-cache-dtype fp8`, `kv_consumer`.
+  - **Measured Post-Warmup HBM (`gpu_memory_utilization=0.85`, `80.53 GiB` cap/TensorCore):** `47.86 GiB` used (weights + `DSpark K=5` drafter + `[16..288]` XLA buffers; `37.13 GiB` free pre-DSpark), leaving **`32.67 GiB` KV HBM/TensorCore (`65.34 GiB`/physical chip) = `3,980,492` FP8 KV tokens/rank (`63,687,872` FP8 KV tokens across `8` decode chips)**.
+- **Scheduler Caps & Speculative Decoding:** `max_num_seqs = 48` (`48 x 16 = 768` global decode slots across `b0` + `b1`), `max_num_batched_tokens = 288` per DP rank (`compile_sizes = [16, 40, 48, 64, 96, 192, 288]`), `DSpark` speculative decoding `K=5`.
+- **Workload (`S1 = 2048 : 1024`, `0.00%` Prefix Cache Hit):**
+  - Exact `ISL = 2,048` tokens (`word_count = 2048`, deterministic `run_seed = 101` matching `R1a`, `0.0000%` realized prefix cache hit across all **`58,296`** measured requests), `POST /reset_prefix_cache` verified (`HTTP 200`) on all `4` vLLM servers before every concurrency level.
+  - Forced exact `OSL = 1,024` tokens (`max_tokens=1024, min_tokens=1024, ignore_eos=True, temperature=0.6`), `15.0 s` warmup at `c=16` (`108/108` OK), then `300.0 s` exact steady-state window + full in-flight drain across all `8` levels (`32, 64, 128, 256, 384, 512, 768, 1024`).
+
+---
+
+## 2. Complete Rule 4 Metrics Table (`c = 32 .. 1024`)
+
+| Concurrency (`c`) | Steady Window | Steady Out tok/s (Gain) | Out tok/s / Decode Chip (`/8`) | Out tok/s / Total Chip (`/16`) | Server Gen tok/s (`60-290s`) | Steady In tok/s | Total (`in+out`) tok/s | Per-User tok/s `Med / P90_low / P95_low` (In-Win \| All) | TTFT `P50 / P95 / P99` (s) All-Reqs | TTFT `P50 / P95 / P99` (s) In-Window | TPOT `P50 / P95 / P99` (ms) All-Reqs | `DSpark` $\tau$ (`Full` / `60-290s`) | Decode Batch / DP Rank (`mean / med / max`, `30-295s`) | KV Usage % `Steady / Peak-Rank` | Pod Split (`P h0/h1` · `D b0/b1`) | Preemptions (`P / D`) | Failures |
+|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|---|---|---|---|---:|---:|
+| **`32`** | `300.0 s` | **`4,149.10`** *(base)* | **`518.64`** | **`259.32`** | `4,307.76` | `8,410.45` | `12,559.55` | `141.92 / 116.69 / 100.21` \| `141.86 / 116.05 / 98.99` | `0.345 / 0.547 / 4.155` | `0.345 / 0.549 / 4.155` | `7.05 / 10.10 / 13.18` | **`3.8499`** / `3.8750` | `1.93 / 2.0 / 3.0` (`30.9` tot) | `D`: `0.422% / 1.194%` · `P`: `0.002% / 0.118%` | `P`:`45.7/54.3%` · `D`:`49.2/50.8%` | `0 / 0` | **`0 / 1,233`** |
+| **`64`** | `300.0 s` | **`8,044.30`** (`+93.88%`) | **`1,005.54`** | **`502.77`** | `8,191.28` | `16,288.43` | `24,332.73` | `134.29 / 117.52 / 107.01` \| `134.39 / 117.59 / 107.01` | `0.390 / 0.869 / 1.603` | `0.390 / 0.873 / 1.605` | `7.44 / 9.34 / 12.12` | **`4.0109`** / `4.0168` | `3.82 / 4.0 / 6.0` (`61.1` tot) | `D`: `0.833% / 1.544%` · `P`: `0.009% / 0.236%` | `P`:`47.9/52.1%` · `D`:`50.1/49.9%` | `0 / 0` | **`0 / 2,389`** |
+| **`128`** | `300.0 s` | **`13,562.52`** (`+68.60%`) | **`1,695.32`** | **`847.66`** | `14,873.25` | `27,572.91` | `41,135.43` | `123.83 / 100.93 / 74.89` \| `124.10 / 101.57 / 76.00` | `0.546 / 1.340 / 6.056` | `0.544 / 1.342 / 6.677` | `8.06 / 13.16 / 24.53` | **`4.1135`** / `4.1150` | `7.46 / 7.0 / 11.0` (`119.3` tot) | `D`: `1.626% / 2.367%` · `P`: `0.035% / 0.569%` | `P`:`49.6/50.4%` · `D`:`50.6/49.4%` | `0 / 0` | **`0 / 4,046`** |
+| **`256`** | `300.0 s` | **`18,931.05`** (`+39.58%`) | **`2,366.38`** | **`1,183.19`** | `20,851.64` | `38,604.80` | `57,535.85` | `87.17 / 65.96 / 57.89` \| `87.32 / 66.31 / 58.38` | `1.088 / 2.025 / 12.350` | `1.091 / 2.060 / 12.364` | `11.45 / 17.13 / 30.36` | **`4.1323`** / `4.1318` | `14.74 / 15.0 / 18.0` (`235.8` tot) | `D`: `3.221% / 4.014%` · `P`: `0.117% / 0.589%` | `P`:`49.8/50.2%` · `D`:`50.7/49.3%` | `0 / 0` | **`0 / 5,689`** |
+| **`384`** | `300.0 s` | **`26,213.37`** (`+38.47%`) | **`3,276.67`** | **`1,638.34`** | `27,073.15` | `53,637.12` | `79,850.49` | `75.23 / 65.54 / 60.36` \| `74.91 / 64.50 / 58.28` | `1.153 / 2.034 / 6.312` | `1.147 / 2.037 / 6.332` | `13.35 / 17.16 / 21.69` | **`4.1418`** / `4.1654` | `22.27 / 22.0 / 26.0` (`356.3` tot) | `D`: `4.860% / 5.764%` · `P`: `0.172% / 0.943%` | `P`:`49.8/50.2%` · `D`:`50.3/49.7%` | `0 / 0` | **`0 / 7,887`** |
+| **`512`** | `300.0 s` | **`32,330.91`** (`+23.34%`) | **`4,041.36`** | **`2,020.68`** | `35,539.63` | `66,252.80` | `98,583.71` | `74.82 / 52.30 / 39.52` \| `74.75 / 53.42 / 39.84` | `1.238 / 2.207 / 5.459` | `1.240 / 2.230 / 5.492` | `13.38 / 25.10 / 31.58` | **`4.1650`** / `4.1720` | `29.44 / 29.0 / 35.0` (`471.0` tot) | `D`: `6.440% / 7.719%` · `P`: `0.279% / 1.041%` | `P`:`50.9/49.1%` · `D`:`50.7/49.3%` | `0 / 0` | **`0 / 9,758`** |
+| **`768`** | `300.0 s` | **`42,719.11`** (`+32.13%`) | **`5,339.89`** | **`2,669.94`** | `44,220.72` | `87,934.29` | `130,653.40` | `61.33 / 53.83 / 48.56` \| `61.33 / 53.65 / 48.88` | `1.284 / 2.389 / 10.308` | `1.279 / 2.545 / 10.755` | `16.30 / 20.46 / 24.09` | **`4.1760`** / `4.1726` | `44.67 / 45.0 / 48.0` (`714.7` tot) | `D`: `9.745% / 11.013%` · `P`: `0.356% / 1.041%` | `P`:`51.0/49.0%` · `D`:`50.0/50.0%` | `0 / 0` | **`0 / 12,933`** |
+| **`1024`** | `300.0 s` | **`46,822.96`** (`+9.61%`) | **`5,852.87`** | **`2,926.44`** | `47,572.52` | `96,256.00` | `143,078.96` | `62.15 / 55.96 / 54.19` \| `62.21 / 55.96 / 54.13` | `5.537 / 8.559 / 17.349` | `5.525 / 8.655 / 17.549` | `16.08 / 18.48 / 21.40` | **`4.1356`** / `4.1426` | `47.77 / 48.0 / 48.0` (`764.3` tot) | `D`: `11.148% / 12.557%` · `P`: `1.104% / 2.003%` | `P`:`49.9/50.1%` · `D`:`49.9/50.1%` | `0 / 0` | **`0 / 14,361`** |
+
+---
+
+## 3. Limiting-Factor & `EP=8` vs `EP=16` Physics Analysis
+
+1. **Headline Operating Points (`2 x 4-chip EP=8` Decode on `8` `tpu7x` Chips):**
+   - **Maximum Saturated Throughput (`c=1024`):** **`46,822.96` out tok/s** (**`5,852.87` out tok/s per decode chip (`/8`)**, **`2,926.44` out tok/s per total chip (`/16`)**, server steady gen rate **`47,572.52` tok/s**, **`143,078.96` total `in+out` tok/s** at `0.00%` cache hit!), **`+14.46%`** above `R1a` (`EP=16` `40,907.05` out tok/s), sustaining **`62.21` tok/s median (`55.96` `P90_low`)** per active stream (`TPOT P50 = 16.08 ms`).
+   - **Unqueued Full-Bucket & Interactive (`~60–65 tok/s/user`) Operating Point (`c=768`):** **`42,719.11` out tok/s** (**`5,339.89` out tok/s per decode chip**, **`2,669.94` out tok/s per total chip**, `130,653.40` total `in+out` tok/s) at **`61.33` tok/s median (`53.65` `P90_low`)** and **`1.284 s` `P50` / `2.389 s` `P95` TTFT** — **`+13.77%`** faster than `R1a` at `c=768` (`37,549.04` out tok/s) and **`+93.73%` (`1.94x`)** higher throughput than `R1a`'s `~61 tok/s/user` operating point (`c=384`, `22,051.02` out tok/s)!
+   - **High-Speed Interactive Operating Point (`c=384`):** **`26,213.37` out tok/s** (`3,276.67`/decode-chip) at **`74.91` tok/s median (`64.50` `P90_low`)** and **`1.153 s` `P50` / `2.034 s` `P95` TTFT** (`+18.88%` throughput and `+22.11%` per-user speed over `R1a` `c=384`).
+
+2. **Why `2 x EP=8` Outperforms `1 x EP=16` by `+13.3%` to `+46.3%` Across Every Concurrency Level:**
+   - **Intra-Host 1D ICI vs Multi-Host 2D ICI `all_to_all` (`+13.3%` to `+18.9%` Full-Bucket Gain):** Each `DP=8, EP=8` instance executes fused `MXFP4 W4A8` MoE `all_to_all` strictly within a single 4-chip `tpu7x` host tray (`device_ids=[0..7]`), eliminating cross-host ICI hop latency across all MoE layers (`TPOT P50` improves from `8.33 -> 7.05 ms` at `c=32` and `18.37 -> 16.08 ms` at `c=1024`).
+   - **Decoupled 8-Rank XLA Bucket Barriers (`+46.26%` at `c=256`, `+39.73%` at `c=512`):** On `1 x EP=16`, a single DP rank exceeding `16` seqs (`96 -> 192` bucket) or `32` seqs (`192 -> 288` bucket) forces all `16` ranks across both hosts into the larger XLA graph (`+9.68%` and `+4.93%` knees). Splitting Pool B into two independent `8`-rank `EP=8` instances (`50.0% / 50.0%` balanced by `llm-d` `active-request-scorer`) halves the synchronous collective barrier width and smooths the XLA bucket staircase (`+39.58%` gain at `c=256`, `+23.34%` gain at `c=512`).
+
+3. **True Limiting Factor at `c=1024` & KV HBM Headroom:**
+   - **Hard `max_num_seqs = 48` Scheduler Cap (`768` Global Slots):** At `c=1024`, Decode batch pins at **`47.77 / 48.0 / 48.0` per DP rank** (`764.3 / 768` global slots = **`99.52%` fill**), queueing the excess `256` requests cleanly (`5.537 s` `P50` TTFT) while active streams run at `62.21` tok/s median (`55.96` `P90_low`).
+   - **Abundant KV HBM Headroom (`87.4%` Free at `c=1024`) & Zero Errors:** Even at `143,079` total tok/s, Decode KV usage reached only **`11.15%` steady mean / `12.56%` peak single-rank** (`0` preemptions), `llm-d` `EndpointPicker` balanced requests **`49.94% / 50.06%`** (`7,172 / 7,189`) across `b0` and `b1`, and **all `58,296` requests across `c=32..1024` succeeded (`0` failures)**.
