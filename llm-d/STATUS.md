@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T07:27:36Z`
+- **Last Updated (UTC):** `2026-11-07T07:40:32Z`
 
 ---
 
@@ -21,7 +21,7 @@
 | `2026-11-07T03:54Z` | **STEP 3 `R1b`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`2x4c` `EP=8` Pool B) + `R1` Snapshot** | **COMPLETE (`R1b` Wins `8/8` Levels, Peak `46,822.96` out tok/s)** | Completed ladder `c = 32, 64, 128, 256, 384, 512, 768, 1024` (`300.0 s` window/level, `0.00%` cache hit). Peak **`46,822.96` out tok/s** (**`5,852.87`/dec-chip**, **`2,926.44`/tot-chip**) at `c=1024` (`+14.46%` vs `R1a`), and **`42,719.11` out tok/s** (`5,339.89`/dec-chip, `61.33` tok/s median, `1.284 s` P50 TTFT) at `c=768` (`+13.77%` vs `R1a`; `+93.73%` throughput at `~61 tok/s/user`), `DSpark tau = 3.85..4.18`, **`0 / 58,296` failures**. Published `R1_INTERIM_SNAPSHOT.md`: **`2 x 4c EP=8` wins `8/8` levels (`+13.3%..+46.3%`)**. | Proceed to Step 4 `R2` (`S2`/`S3` multi-shape sweep on winning `2x4c EP=8` Decode). |
 | `2026-11-07T05:21Z` | **STEP 3 `R2`: Matched-Shape Sweep (`S2=1024:1024`, `S3=8192:1024`, `2P2D` `EP=8`)** | **COMPLETE (`S2` & `S3` Done)** | **`S2` (`1024:1024`):** `c=32,64,128,256,384,512,768,1024` done, peak **`44,166.04` out tok/s** (`5,520.76`/dec-chip @ `c=1024`, `0/56,152` err) · **`S3` (`8192:1024`):** `c=32,64,128,256,384,512,768` done, peak **`26,229.45` out tok/s** (`3,278.68`/dec-chip, `214,794` in tok/s @ `c=512`, `0/37,360` err). | Publish `r2_summary.md` & launch Step 3 `R3` (`Decode-Only Ceiling`). |
 | `2026-11-07T05:52Z` | **STEP 3 `R3`: Decode-Only Ceiling (`S1` `~99.5%` Cached, `2P2D` `EP=8`)** | **COMPLETE (Ceiling `44,100.66` out tok/s @ `c=1024`)** | Swept `c = 256, 384, 512, 768, 1024` (`~99.5%` prefix hit, Prefill `<5%` busy). True Decode Ceiling **`44,100.66` out tok/s** (**`5,512.58`/dec-chip**, **`2,756.29`/tot-chip**) at `c=1024`, `DSpark tau = 4.14..4.15`, `0 / 47,647` failures. | Proceed to Step 4 `R4` (`Agentic Prefix-Aware Routing`). |
-| `2026-11-07T07:27Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **IN PROGRESS** | `roundrobin` (n=?,?,?): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=?,?,?): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | Continue `prefix_aware_dppin` sweep. |
+| `2026-11-07T07:40Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **IN PROGRESS** | `roundrobin` (n=?,?,?): hit `1.6/2.1/2.7%`, TTFT P50 `2.32/2.92/10.84` s, out/tot-chip `281.5/511.8/610.1` · `prefix_aware` (n=?,?,?): hit `2.9/2.0/3.2%`, TTFT P50 `2.35/3.12/10.90` s, out/tot-chip `278.8/498.0/602.6` | Next routing condition / R4 summary. |
 
 
 ---
@@ -164,4 +164,5 @@
 | `prefix_aware` | `?` | `600` s | **`3.23%`** / `3.23%` | **`10.898 / 18.740 / 22.569`** | **`9,642.22`** | `1,205.28` | `602.64` | `259,563.11` | `87.64 / 73.28 / 69.69` | `18,778.0 / 728.1` | `—` | `P 0.0 / D 0.0` | `0 / 8164` |
 | `prefix_aware_dppin` | `?` | `600` s | **`45.69%`** / `45.69%` | **`1.825 / 7.047 / 9.107`** | **`4,584.96`** | `573.12` | `286.56` | `126,587.44` | `91.91 / 77.91 / 74.62` | `18,805.5 / 708.6` | `—` | `P 0.0 / D 0.0` | `0 / 3912` |
 | `prefix_aware_dppin` | `?` | `600` s | **`68.08%`** / `68.08%` | **`1.778 / 30.884 / 41.607`** | **`7,230.94`** | `903.87` | `451.93` | `199,846.51` | `82.88 / 65.21 / 59.46` | `18,811.5 / 707.8` | `—` | `P 0.0 / D 0.0` | `0 / 6218` |
+| `prefix_aware_dppin` | `?` | `600` s | **`62.95%`** / `62.95%` | **`1.833 / 167.782 / 176.501`** | **`5,940.05`** | `742.51` | `371.25` | `167,696.75` | `86.48 / 57.79 / 49.06` | `18,805.3 / 686.3` | `—` | `P 0.0 / D 0.0` | `0 / 5412` |
 <!-- R4_RESULTS_END -->
