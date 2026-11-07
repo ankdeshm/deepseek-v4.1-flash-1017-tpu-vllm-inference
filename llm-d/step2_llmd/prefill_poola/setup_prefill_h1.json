@@ -1,0 +1,54 @@
+{
+  "shard": "h1",
+  "host": "gke-tpu-51ea19d7-xq6s",
+  "ip": "192.168.100.38",
+  "spec": {
+    "expected_ip": "192.168.100.38",
+    "expected_node": "gke-tpu-51ea19d7-xq6s",
+    "run_id": "llmd_h1",
+    "kv_namespace": "prefill_llmd_h1",
+    "engine_id": "prefill-engine-llmd-h1"
+  },
+  "ckpt": {
+    "setup_wall_s": 118.65,
+    "ckpt_bytes": 510310755720,
+    "ckpt_gcs_to_shm_s": 118.49,
+    "ckpt_gcs_gb_per_s": 4.31,
+    "pd_env": {
+      "PYTHONHASHSEED": "0",
+      "VLLM_HTTP_TIMEOUT_KEEP_ALIVE": "120",
+      "SERVED_MODEL_NAME": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "ADVERTISE_HOST": "192.168.100.38",
+      "RUN_ID": "llmd_h1",
+      "TPU_KV_TRANSFER_NAMESPACE": "prefill_llmd_h1",
+      "TPU_RAIDEN_ENGINE_ID": "prefill-engine-llmd-h1",
+      "PORT": "8000",
+      "KV_ROLE": "kv_producer",
+      "KV_PORT": "14579",
+      "CTRL_PORT": "27000",
+      "KV_TRANSFER_PORT": "9100",
+      "SIDE_CHANNEL_PORT": "9600",
+      "TPU_RAIDEN_TRANSFER_PARALLELISM": "1",
+      "CED_PREFILL": "1",
+      "ENABLE_PREFIX_CACHING": "1",
+      "PREFIX_CACHE_RETENTION_INTERVAL": "1024",
+      "MAX_NUM_SEQS": "64",
+      "MAX_NUM_BATCHED_TOKENS": "8192",
+      "COMPILE_SIZES": "[512, 2048, 8192]",
+      "ENABLE_DSPARK": "0",
+      "ASYNC_SCHEDULING": "0",
+      "GPU_MEMORY_UTILIZATION": "0.85"
+    }
+  },
+  "warm_cache_restore": {
+    "tar_obj": "dsv41-v7x-llmd-20261106/compile_cache/compile_cache_prefill_dp8.tar.gz",
+    "tar_size_mb": 3962.83,
+    "download_s": 14.35,
+    "extract_s": 79.26,
+    "tar_returncode": 2,
+    "dropped_trailing_partial_file": "/dev/shm/pd_cache_prefill/vllm/torch_compile_cache/torch_aot_compile/939564093c2b6da1923a038fe000d2f03a85b9c575bf6dbcac38e97f1428495b/inductor_cache/aotautograd/torchtpu_801582bfe66eb52d099fd4a1479a5ca4670e5b36842ee5ae2cac574fb99e5daa/tonlzkmy6epasqt66wo4zvmjepwsr6eoncrh5b4tdzliby2yqgn",
+    "vllm_files": 466,
+    "xla_files": 0
+  },
+  "ts": 1794011069.6839561
+}

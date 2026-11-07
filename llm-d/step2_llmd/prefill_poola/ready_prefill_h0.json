@@ -1,0 +1,72 @@
+{
+  "shard": "h0",
+  "pod_name": "llmd-prefill-poola-h0",
+  "host": "gke-tpu-51ea19d7-rqkr",
+  "ip": "192.168.100.43",
+  "port": 8000,
+  "served_model_name": "deepseek-ai/DeepSeek-V4.1-Flash",
+  "run_id": "llmd_h0",
+  "kv_namespace": "prefill_llmd_h0",
+  "raiden_engine_id": "prefill-engine-llmd-h0",
+  "http_timeout_keep_alive_s": 120,
+  "pythonhashseed": 0,
+  "boot_s": 900.27,
+  "models_response": {
+    "object": "list",
+    "data": [
+      {
+        "id": "deepseek-ai/DeepSeek-V4.1-Flash",
+        "object": "model",
+        "created": 1794011994,
+        "owned_by": "vllm",
+        "root": "/dev/shm/DeepSeek-V4.1-Flash",
+        "parent": null,
+        "max_model_len": 131072,
+        "permission": [
+          {
+            "id": "modelperm-a232b9aaaa4c1da6",
+            "object": "model_permission",
+            "created": 1794011994,
+            "allow_create_engine": false,
+            "allow_sampling": true,
+            "allow_logprobs": true,
+            "allow_search_indices": false,
+            "allow_view": true,
+            "allow_fine_tuning": false,
+            "organization": "*",
+            "group": null,
+            "is_blocking": false
+          }
+        ]
+      }
+    ]
+  },
+  "local_smoke_completion": {
+    "status": 200,
+    "latency_s": 1.692,
+    "id": "cmpl-8fd93c426761324c",
+    "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": " is Paris. The capital of Italy is Rome. The capital of Italy is Rome",
+    "usage": {
+      "prompt_tokens": 5,
+      "total_tokens": 21,
+      "completion_tokens": 16,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": null,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": null
+    }
+  },
+  "clean_cache_archive": {
+    "gcs_uri": "gs://ank-usc1-bucket-314837540096/dsv41-v7x-llmd-20261106/compile_cache/compile_cache_prefill_dp8_phs0.tar.gz",
+    "size_bytes": 5161524809,
+    "remote_size_bytes": 5161524809,
+    "md5Hash": "+RNqTfBDRYQRN3dC9KW7Rg==",
+    "upload_s": 31.31,
+    "pack_s": 236.22,
+    "gzip_verified": true
+  },
+  "ready_ts": 1794012378.688579
+}
