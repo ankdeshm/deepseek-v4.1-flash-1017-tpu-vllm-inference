@@ -6,7 +6,7 @@
 - **Verified Precision (Rule 1):** Attention/non-expert `FP8` (`float8_e4m3fn`, `scale_fmt=ue8m0`, MLA core `BF16`), MoE routed experts `MXFP4` (`384` routed + `1` shared, `top-6`, `W4A8` fused EP GMM), KV cache `FP8` (`--kv-cache-dtype fp8`)
 - **GCS Artifact Root:** `gs://YOUR_GCS_BUCKET/dsv41-v7x-llmd-20261106/` (mirrored status at `gs://YOUR_GCS_BUCKET/atlas/v7x16-llmd-20261106/STATUS.md`)
 - **GitHub Subfolder:** `llm-d/` in `ankdeshm/deepseek-v4.1-flash-1017-tpu-vllm-inference`
-- **Last Updated (UTC):** `2026-11-07T05:52:43Z`
+- **Last Updated (UTC):** `2026-11-07T06:06:27Z`
 
 ---
 
@@ -21,6 +21,7 @@
 | `2026-11-07T03:54Z` | **STEP 3 `R1b`: `S1 = 2048:1024` (`P`=`2x4c` Pool A, `D`=`2x4c` `EP=8` Pool B) + `R1` Snapshot** | **COMPLETE (`R1b` Wins `8/8` Levels, Peak `46,822.96` out tok/s)** | Completed ladder `c = 32, 64, 128, 256, 384, 512, 768, 1024` (`300.0 s` window/level, `0.00%` cache hit). Peak **`46,822.96` out tok/s** (**`5,852.87`/dec-chip**, **`2,926.44`/tot-chip**) at `c=1024` (`+14.46%` vs `R1a`), and **`42,719.11` out tok/s** (`5,339.89`/dec-chip, `61.33` tok/s median, `1.284 s` P50 TTFT) at `c=768` (`+13.77%` vs `R1a`; `+93.73%` throughput at `~61 tok/s/user`), `DSpark tau = 3.85..4.18`, **`0 / 58,296` failures**. Published `R1_INTERIM_SNAPSHOT.md`: **`2 x 4c EP=8` wins `8/8` levels (`+13.3%..+46.3%`)**. | Proceed to Step 4 `R2` (`S2`/`S3` multi-shape sweep on winning `2x4c EP=8` Decode). |
 | `2026-11-07T05:21Z` | **STEP 3 `R2`: Matched-Shape Sweep (`S2=1024:1024`, `S3=8192:1024`, `2P2D` `EP=8`)** | **COMPLETE (`S2` & `S3` Done)** | **`S2` (`1024:1024`):** `c=32,64,128,256,384,512,768,1024` done, peak **`44,166.04` out tok/s** (`5,520.76`/dec-chip @ `c=1024`, `0/56,152` err) · **`S3` (`8192:1024`):** `c=32,64,128,256,384,512,768` done, peak **`26,229.45` out tok/s** (`3,278.68`/dec-chip, `214,794` in tok/s @ `c=512`, `0/37,360` err). | Publish `r2_summary.md` & launch Step 3 `R3` (`Decode-Only Ceiling`). |
 | `2026-11-07T05:52Z` | **STEP 3 `R3`: Decode-Only Ceiling (`S1` `~99.5%` Cached, `2P2D` `EP=8`)** | **COMPLETE (Ceiling `44,100.66` out tok/s @ `c=1024`)** | Swept `c = 256, 384, 512, 768, 1024` (`~99.5%` prefix hit, Prefill `<5%` busy). True Decode Ceiling **`44,100.66` out tok/s** (**`5,512.58`/dec-chip**, **`2,756.29`/tot-chip**) at `c=1024`, `DSpark tau = 4.14..4.15`, `0 / 47,647` failures. | Proceed to Step 4 `R4` (`Agentic Prefix-Aware Routing`). |
+| `2026-11-07T06:06Z` | **STEP 3 `R4`: `llm-d` Prefix-Aware vs Cache-Blind Routing (Agentic, `80%` hit, `600 s`/level)** | **IN PROGRESS** | `roundrobin` (n=?): hit `1.6%`, TTFT P50 `2.32` s, out/tot-chip `281.5` | Continue `roundrobin` sweep. |
 
 
 ---
@@ -143,3 +144,17 @@
 - **Completion:** Stopped after `c=1024` (Rule 1 (Throughput Plateau >= c=1024): gain_vs_prev=+2.88% < +5.0%) (`0 / 47,647` failures).
 - **True Pool B Decode Ceiling (`c=1024`):** **`44,100.66` out tok/s** (**`5,512.58` out tok/s/decode-chip**, **`2,756.29` out tok/s/total-chip**, server gen `44395.98` tok/s), `DSpark tau = 4.1362`, per-user `Med / P90_low = 59.49 / 53.02` tok/s, `0` preemptions, `0` failures.
 <!-- R3_RESULTS_END -->
+
+<!-- R4_RESULTS_START -->
+---
+
+## Step 3 (`R4`) Results — `llm-d` Prefix-Cache-Aware vs Cache-Blind Routing (Agentic, `80%` target hit)
+
+- **Topology:** `llm-d` `v1.0.0` `EndpointPicker` -> Pool A `2 x 4c` `EP=8` Prefill (`h0`, `h1`) + Pool B `2 x 4c` `EP=8` Decode (`b0`, `b1`).
+- **Condition (a) `roundrobin`:** cache-blind prefill routing (`token-load-scorer` + `max-score-picker`, no prefix producer / affinity filter). **Condition (b) `prefix_aware`:** `approx-prefix-cache-producer` (`maxPrefixTokensToMatch=131072`) + `prefix-cache-affinity-filter`.
+- **Workload:** `requests_mocked.jsonl.xz` (`50:20:12:9:9` ISL mix), `256` distinct trunks (`128` per prefill instance), `80%` target hit, natural stop (`ignore_eos=False`), `600 s` per level, `n = 64 -> 128 -> 256`, one cache reset per condition only (none between levels).
+
+| Routing | `n` | Window | Realized Hit (API / Prom prefill) | TTFT `P50 / P95 / P99` (s, ALL reqs) | Out tok/s | /Dec Chip (`/8`) | /Tot Chip (`/16`) | Total (`in+out`) tok/s | Per-User `Med / P90_low / P95_low` | Mean ISL / OSL | `DSpark` $\tau$ | Preempt | Failures |
+|---|---:|---:|---|---|---:|---:|---:|---:|---|---|---:|---|---:|
+| `roundrobin` | `?` | `600` s | **`1.60%`** / `1.60%` | **`2.322 / 7.028 / 9.472`** | **`4,503.93`** | `562.99` | `281.50` | `117,831.40` | `95.39 / 81.53 / 77.82` | `18,780.4 / 747.7` | `—` | `P 0.0 / D 0.0` | `0 / 3650` |
+<!-- R4_RESULTS_END -->
