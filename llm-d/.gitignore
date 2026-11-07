@@ -12,4 +12,5 @@ step2_llmd/prefill_poola/*.log
 step3_runs/**/*.log
 step3_runs/**/pd_*.log
 step3_runs/**/*_requests_*.json
+step3_runs/**/*_requests.json*
 
