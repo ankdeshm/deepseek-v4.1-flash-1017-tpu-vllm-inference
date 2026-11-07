@@ -9,7 +9,8 @@
     64,
     128,
     256,
-    384
+    384,
+    512
   ],
   "stopped_early": false,
   "stop_reasons": [],
@@ -1497,6 +1498,304 @@
           "d1:7": 496640.0
         },
         "epp_disagg_decisions_delta": 7777.0
+      },
+      "stop_evaluation": {
+        "should_stop": false,
+        "min_concurrency_for_gain_stop": 1024,
+        "reasons": []
+      }
+    },
+    {
+      "run_name": "r2",
+      "shape_name": "s2",
+      "ep_per_decode_instance": 8,
+      "concurrency": 512,
+      "timestamp_utc": "2026-11-07T04:31:56.084570+00:00",
+      "workload": {
+        "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+        "target_isl": 1024,
+        "calibrated_word_count": 1024,
+        "target_osl": 1024,
+        "ignore_eos": true,
+        "temperature": 0.6,
+        "target_cache_hit_pct": 0.0,
+        "realized_cache_hit_pct": 0.0,
+        "mean_prompt_tokens": 1024.0,
+        "mean_completion_tokens": 1024.0
+      },
+      "window": {
+        "steady_window_s": 300.0,
+        "drain_wall_s": 318.317,
+        "total_requests_launched": 9000,
+        "ok_requests": 9000,
+        "in_window_completed_requests": 8488,
+        "straddling_requests": 512,
+        "failed_requests": 0,
+        "errors_sample": []
+      },
+      "throughput": {
+        "steady_out_tok_s": 29835.57,
+        "out_tok_s_per_decode_chip": 3729.45,
+        "out_tok_s_per_total_chip": 1864.72,
+        "decode_chips": 8,
+        "total_chips": 16,
+        "steady_in_tok_s": 30655.15,
+        "steady_total_tok_s": 60490.72,
+        "server_gen_tok_s_60_290": 30324.02,
+        "drain_wall_out_tok_s": 28952.25,
+        "gain_vs_prev_pct": 15.41
+      },
+      "per_user_decode_tps": {
+        "all_requests": {
+          "count": 9000,
+          "mean": 62.8534,
+          "median": 62.3968,
+          "p90_low": 53.3453,
+          "p95_low": 46.3793,
+          "p90_hi": 74.6616
+        },
+        "in_window": {
+          "count": 8488,
+          "mean": 62.6925,
+          "median": 62.2381,
+          "p90_low": 53.2503,
+          "p95_low": 46.2762,
+          "p90_hi": 74.501
+        }
+      },
+      "ttft_s": {
+        "all_requests": {
+          "count": 9000,
+          "mean": 0.7987,
+          "p50": 0.6466,
+          "p90": 1.2576,
+          "p95": 1.5527,
+          "p99": 3.2349
+        },
+        "in_window": {
+          "count": 8488,
+          "mean": 0.8092,
+          "p50": 0.6495,
+          "p90": 1.2861,
+          "p95": 1.5696,
+          "p99": 3.2408
+        }
+      },
+      "tpot_ms": {
+        "all_requests": {
+          "count": 9000,
+          "mean": 16.3168,
+          "p50": 16.0265,
+          "p90": 18.7458,
+          "p95": 21.5613,
+          "p99": 28.3512
+        },
+        "in_window": {
+          "count": 8488,
+          "mean": 16.3602,
+          "p50": 16.0673,
+          "p90": 18.7792,
+          "p95": 21.6094,
+          "p99": 28.4155
+        }
+      },
+      "e2e_s": {
+        "all_requests": {
+          "count": 9000,
+          "mean": 17.4907,
+          "p50": 17.1292,
+          "p90": 20.5406,
+          "p95": 22.8941,
+          "p99": 29.8486
+        },
+        "in_window": {
+          "count": 8488,
+          "mean": 17.5456,
+          "p50": 17.1828,
+          "p90": 20.6017,
+          "p95": 22.9599,
+          "p99": 30.0224
+        }
+      },
+      "dspark": {
+        "mean_accept_len_tau": 3.9492,
+        "steady_60_290_tau": 3.9565,
+        "num_drafts": 2338938.0,
+        "num_draft_tokens": 11694690.0,
+        "num_accepted": 6897950.0,
+        "per_pos_accept_rates": {
+          "0": 0.6617,
+          "1": 0.6097,
+          "2": 0.5817,
+          "3": 0.5565,
+          "4": 0.5395
+        }
+      },
+      "decode_batch_30_295": {
+        "per_dp_rank_mean": 30.91,
+        "per_dp_rank_median": 31.0,
+        "per_dp_rank_max": 34.0,
+        "total_running_mean": 494.61,
+        "total_running_median": 497.0,
+        "total_running_max": 510.0,
+        "prefill_running_mean": 0.0,
+        "prefill_running_max": 0.0,
+        "by_engine": {
+          "d0:0": {
+            "mean": 30.92,
+            "median": 31.0,
+            "max": 34.0
+          },
+          "d0:1": {
+            "mean": 31.1,
+            "median": 31.0,
+            "max": 34.0
+          },
+          "d0:2": {
+            "mean": 30.78,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d0:3": {
+            "mean": 30.8,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d0:4": {
+            "mean": 31.0,
+            "median": 31.0,
+            "max": 34.0
+          },
+          "d0:5": {
+            "mean": 30.71,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d0:6": {
+            "mean": 30.78,
+            "median": 31.0,
+            "max": 34.0
+          },
+          "d0:7": {
+            "mean": 30.86,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d1:0": {
+            "mean": 30.96,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d1:1": {
+            "mean": 30.98,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d1:2": {
+            "mean": 30.98,
+            "median": 31.0,
+            "max": 34.0
+          },
+          "d1:3": {
+            "mean": 30.96,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d1:4": {
+            "mean": 31.18,
+            "median": 31.0,
+            "max": 34.0
+          },
+          "d1:5": {
+            "mean": 30.57,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d1:6": {
+            "mean": 30.96,
+            "median": 31.0,
+            "max": 33.0
+          },
+          "d1:7": {
+            "mean": 31.08,
+            "median": 31.0,
+            "max": 34.0
+          }
+        }
+      },
+      "kv_cache_usage_pct": {
+        "decode_steady_mean_pct": 6.1057,
+        "decode_peak_single_rank_pct": 6.9782,
+        "prefill_steady_mean_pct": 0.0552,
+        "prefill_peak_single_rank_pct": 0.8836
+      },
+      "preemptions": {
+        "prefill": 0.0,
+        "decode": 0.0,
+        "counter_reset_or_unhealthy": false
+      },
+      "routing_distribution": {
+        "prefill_pods": {
+          "h0": {
+            "requests_delta": 4399.0,
+            "prompt_tokens_delta": 4500177.0,
+            "requests_share_pct": 48.88
+          },
+          "h1": {
+            "requests_delta": 4601.0,
+            "prompt_tokens_delta": 4706823.0,
+            "requests_share_pct": 51.12
+          }
+        },
+        "decode_instances": {
+          "d0": {
+            "requests_delta": 4474.0,
+            "generation_tokens_delta": 4581376.0,
+            "requests_share_pct": 49.71
+          },
+          "d1": {
+            "requests_delta": 4526.0,
+            "generation_tokens_delta": 4634624.0,
+            "requests_share_pct": 50.29
+          }
+        },
+        "decode_requests_by_engine": {
+          "d0:0": 559.0,
+          "d0:1": 552.0,
+          "d0:2": 566.0,
+          "d0:3": 556.0,
+          "d0:4": 564.0,
+          "d0:5": 563.0,
+          "d0:6": 555.0,
+          "d0:7": 559.0,
+          "d1:0": 571.0,
+          "d1:1": 563.0,
+          "d1:2": 570.0,
+          "d1:3": 563.0,
+          "d1:4": 569.0,
+          "d1:5": 566.0,
+          "d1:6": 561.0,
+          "d1:7": 563.0
+        },
+        "decode_gen_tokens_by_engine": {
+          "d0:0": 572416.0,
+          "d0:1": 565248.0,
+          "d0:2": 579584.0,
+          "d0:3": 569344.0,
+          "d0:4": 577536.0,
+          "d0:5": 576512.0,
+          "d0:6": 568320.0,
+          "d0:7": 572416.0,
+          "d1:0": 584704.0,
+          "d1:1": 576512.0,
+          "d1:2": 583680.0,
+          "d1:3": 576512.0,
+          "d1:4": 582656.0,
+          "d1:5": 579584.0,
+          "d1:6": 574464.0,
+          "d1:7": 576512.0
+        },
+        "epp_disagg_decisions_delta": 9000.0
       },
       "stop_evaluation": {
         "should_stop": false,
