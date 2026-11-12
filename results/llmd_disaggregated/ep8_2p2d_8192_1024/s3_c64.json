@@ -1,0 +1,298 @@
+{
+  "run_name": "r2",
+  "shape_name": "s3",
+  "ep_per_decode_instance": 8,
+  "concurrency": 64,
+  "timestamp_utc": "2026-11-07T04:54:35.874255+00:00",
+  "workload": {
+    "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "target_isl": 8192,
+    "calibrated_word_count": 8192,
+    "target_osl": 1024,
+    "ignore_eos": true,
+    "temperature": 0.6,
+    "target_cache_hit_pct": 0.0,
+    "realized_cache_hit_pct": 0.0,
+    "mean_prompt_tokens": 8192.0,
+    "mean_completion_tokens": 1024.0
+  },
+  "window": {
+    "steady_window_s": 300.0,
+    "drain_wall_s": 309.914,
+    "total_requests_launched": 2074,
+    "ok_requests": 2074,
+    "in_window_completed_requests": 2010,
+    "straddling_requests": 64,
+    "failed_requests": 0,
+    "errors_sample": []
+  },
+  "throughput": {
+    "steady_out_tok_s": 6944.71,
+    "out_tok_s_per_decode_chip": 868.09,
+    "out_tok_s_per_total_chip": 434.04,
+    "decode_chips": 8,
+    "total_chips": 16,
+    "steady_in_tok_s": 56279.04,
+    "steady_total_tok_s": 63223.75,
+    "server_gen_tok_s_60_290": 6992.96,
+    "drain_wall_out_tok_s": 6852.79,
+    "gain_vs_prev_pct": 87.269
+  },
+  "per_user_decode_tps": {
+    "all_requests": {
+      "count": 2074,
+      "mean": 133.6481,
+      "median": 132.1058,
+      "p90_low": 112.3143,
+      "p95_low": 103.2339,
+      "p90_hi": 158.3333
+    },
+    "in_window": {
+      "count": 2010,
+      "mean": 133.5932,
+      "median": 132.0339,
+      "p90_low": 112.2852,
+      "p95_low": 103.0106,
+      "p90_hi": 158.5916
+    }
+  },
+  "ttft_s": {
+    "all_requests": {
+      "count": 2074,
+      "mean": 1.582,
+      "p50": 1.5929,
+      "p90": 2.142,
+      "p95": 2.3522,
+      "p99": 2.8879
+    },
+    "in_window": {
+      "count": 2010,
+      "mean": 1.5793,
+      "p50": 1.5896,
+      "p90": 2.1424,
+      "p95": 2.3503,
+      "p99": 2.8974
+    }
+  },
+  "tpot_ms": {
+    "all_requests": {
+      "count": 2074,
+      "mean": 7.6508,
+      "p50": 7.5697,
+      "p90": 8.9036,
+      "p95": 9.6867,
+      "p99": 12.4129
+    },
+    "in_window": {
+      "count": 2010,
+      "mean": 7.6551,
+      "p50": 7.5738,
+      "p90": 8.9059,
+      "p95": 9.7078,
+      "p99": 12.43
+    }
+  },
+  "e2e_s": {
+    "all_requests": {
+      "count": 2074,
+      "mean": 9.4088,
+      "p50": 9.2779,
+      "p90": 10.7573,
+      "p95": 11.6922,
+      "p99": 14.1964
+    },
+    "in_window": {
+      "count": 2010,
+      "mean": 9.4104,
+      "p50": 9.2753,
+      "p90": 10.7586,
+      "p95": 11.7225,
+      "p99": 14.2353
+    }
+  },
+  "dspark": {
+    "mean_accept_len_tau": 3.7961,
+    "steady_60_290_tau": 3.7985,
+    "num_drafts": 560739.0,
+    "num_draft_tokens": 2803695.0,
+    "num_accepted": 1567863.0,
+    "per_pos_accept_rates": {
+      "0": 0.6412,
+      "1": 0.5866,
+      "2": 0.5546,
+      "3": 0.5225,
+      "4": 0.4912
+    }
+  },
+  "decode_batch_30_295": {
+    "per_dp_rank_mean": 3.35,
+    "per_dp_rank_median": 3.0,
+    "per_dp_rank_max": 6.0,
+    "total_running_mean": 53.65,
+    "total_running_median": 54.0,
+    "total_running_max": 59.0,
+    "prefill_running_mean": 0.86,
+    "prefill_running_max": 3.0,
+    "by_engine": {
+      "d0:0": {
+        "mean": 3.39,
+        "median": 4.0,
+        "max": 5.0
+      },
+      "d0:1": {
+        "mean": 3.63,
+        "median": 4.0,
+        "max": 5.0
+      },
+      "d0:2": {
+        "mean": 3.12,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d0:3": {
+        "mean": 3.29,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d0:4": {
+        "mean": 3.31,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d0:5": {
+        "mean": 3.39,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d0:6": {
+        "mean": 3.24,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d0:7": {
+        "mean": 3.29,
+        "median": 3.0,
+        "max": 6.0
+      },
+      "d1:0": {
+        "mean": 3.49,
+        "median": 3.0,
+        "max": 6.0
+      },
+      "d1:1": {
+        "mean": 3.39,
+        "median": 3.0,
+        "max": 6.0
+      },
+      "d1:2": {
+        "mean": 3.24,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d1:3": {
+        "mean": 3.24,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d1:4": {
+        "mean": 3.53,
+        "median": 4.0,
+        "max": 5.0
+      },
+      "d1:5": {
+        "mean": 3.14,
+        "median": 3.0,
+        "max": 5.0
+      },
+      "d1:6": {
+        "mean": 3.61,
+        "median": 4.0,
+        "max": 5.0
+      },
+      "d1:7": {
+        "mean": 3.35,
+        "median": 3.0,
+        "max": 5.0
+      }
+    }
+  },
+  "kv_cache_usage_pct": {
+    "decode_steady_mean_pct": 1.1502,
+    "decode_peak_single_rank_pct": 2.079,
+    "prefill_steady_mean_pct": 0.0966,
+    "prefill_peak_single_rank_pct": 0.5694
+  },
+  "preemptions": {
+    "prefill": 0.0,
+    "decode": 0.0,
+    "counter_reset_or_unhealthy": false
+  },
+  "routing_distribution": {
+    "prefill_pods": {
+      "h0": {
+        "requests_delta": 1033.0,
+        "prompt_tokens_delta": 8461303.0,
+        "requests_share_pct": 49.81
+      },
+      "h1": {
+        "requests_delta": 1041.0,
+        "prompt_tokens_delta": 8526831.0,
+        "requests_share_pct": 50.19
+      }
+    },
+    "decode_instances": {
+      "d0": {
+        "requests_delta": 1040.0,
+        "generation_tokens_delta": 1064960.0,
+        "requests_share_pct": 50.14
+      },
+      "d1": {
+        "requests_delta": 1034.0,
+        "generation_tokens_delta": 1058816.0,
+        "requests_share_pct": 49.86
+      }
+    },
+    "decode_requests_by_engine": {
+      "d0:0": 134.0,
+      "d0:1": 136.0,
+      "d0:2": 123.0,
+      "d0:3": 129.0,
+      "d0:4": 130.0,
+      "d0:5": 130.0,
+      "d0:6": 133.0,
+      "d0:7": 125.0,
+      "d1:0": 128.0,
+      "d1:1": 130.0,
+      "d1:2": 124.0,
+      "d1:3": 131.0,
+      "d1:4": 134.0,
+      "d1:5": 128.0,
+      "d1:6": 131.0,
+      "d1:7": 128.0
+    },
+    "decode_gen_tokens_by_engine": {
+      "d0:0": 137216.0,
+      "d0:1": 139264.0,
+      "d0:2": 125952.0,
+      "d0:3": 132096.0,
+      "d0:4": 133120.0,
+      "d0:5": 133120.0,
+      "d0:6": 136192.0,
+      "d0:7": 128000.0,
+      "d1:0": 131072.0,
+      "d1:1": 133120.0,
+      "d1:2": 126976.0,
+      "d1:3": 134144.0,
+      "d1:4": 137216.0,
+      "d1:5": 131072.0,
+      "d1:6": 134144.0,
+      "d1:7": 131072.0
+    },
+    "epp_disagg_decisions_delta": 2074.0
+  },
+  "stop_evaluation": {
+    "should_stop": false,
+    "min_concurrency_for_gain_stop": 256,
+    "reasons": []
+  }
+}

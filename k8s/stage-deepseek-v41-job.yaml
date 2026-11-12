@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: stage-hf-deepseek-v41
+  namespace: default
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: stage-hf-deepseek-v41
+    spec:
+      serviceAccountName: default
+      restartPolicy: OnFailure
+      nodeSelector:
+        cloud.google.com/gke-nodepool: default-pool
+      containers:
+      - name: streamer
+        image: python:3.11-slim
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          set -euo pipefail
+          pip install --no-cache-dir -q huggingface_hub google-cloud-storage requests
+          python3 /scripts/stage_hf_to_gcs.py \
+            --bucket=YOUR_GCS_BUCKET \
+            --prefix=models \
+            --workers=10 \
+            --repos="deepseek-ai/DeepSeek-V4.1-Flash-1017"
+        env:
+        - name: HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: hf-token
+              key: HF_TOKEN
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "3500m"
+            memory: "6Gi"
+        volumeMounts:
+        - name: stage-script
+          mountPath: /scripts
+      volumes:
+      - name: stage-script
+        configMap:
+          name: stage-hf-script

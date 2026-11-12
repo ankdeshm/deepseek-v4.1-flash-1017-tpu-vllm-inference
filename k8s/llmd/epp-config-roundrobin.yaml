@@ -1,0 +1,80 @@
+# R4 Condition (a): Cache-Blind Round-Robin / Even-Load Prefill Routing
+# Removes `approx-prefix-cache-producer` and `prefix-cache-affinity-filter` from `pd-config.yaml`
+# so EndpointPicker routes prefill requests across `llmd-prefill-poola-h0` and `llmd-prefill-poola-h1`
+# with zero prefix-cache affinity (even load / random tie-break).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pd-disaggregation-epp
+  namespace: default
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    meta.helm.sh/release-name: pd-disaggregation
+    meta.helm.sh/release-namespace: default
+data:
+  default-plugins.yaml: |
+    apiVersion: llm-d.ai/v1
+    kind: EndpointPickerConfig
+    plugins:
+    - type: queue-scorer
+    - type: kv-cache-utilization-scorer
+    - type: prefix-cache-scorer
+    - type: metrics-data-source
+      parameters:
+        scheme: "http"
+        path: "/metrics"
+        insecureSkipVerify: true
+    - type: core-metrics-extractor
+    schedulingProfiles:
+    - name: default
+      plugins:
+      - pluginRef: queue-scorer
+        weight: 2
+      - pluginRef: kv-cache-utilization-scorer
+        weight: 2
+      - pluginRef: prefix-cache-scorer
+        weight: 3
+  payload-agnostic.yaml: |
+    apiVersion: llm-d.ai/v1
+    kind: EndpointPickerConfig
+    plugins:
+    - type: passthrough-parser
+    - type: active-request-scorer
+    - type: session-affinity-scorer
+    requestHandler:
+      parsers:
+      - pluginRef: passthrough-parser
+    schedulingProfiles:
+    - name: default
+      plugins:
+      - pluginRef: active-request-scorer
+        weight: 1
+      - pluginRef: session-affinity-scorer
+        weight: 1
+  pd-config.yaml: |
+    apiVersion: llm-d.ai/v1
+    kind: EndpointPickerConfig
+    plugins:
+    - type: always-disagg-pd-decider
+    - type: disagg-profile-handler
+      parameters:
+        deciders:
+          prefill: always-disagg-pd-decider
+    - type: prefill-filter
+    - type: decode-filter
+    - type: inflight-load-producer
+    - type: token-load-scorer
+    - type: active-request-scorer
+    - type: max-score-picker
+    schedulingProfiles:
+    - name: prefill
+      plugins:
+      - pluginRef: prefill-filter
+      - pluginRef: token-load-scorer
+      - pluginRef: max-score-picker
+    - name: decode
+      plugins:
+      - pluginRef: decode-filter
+      - pluginRef: active-request-scorer
+      - pluginRef: max-score-picker
